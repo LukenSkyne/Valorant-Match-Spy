@@ -1,4 +1,4 @@
-module changeme
+module match-spy
 
 go 1.17
 
