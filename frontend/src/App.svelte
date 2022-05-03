@@ -1,12 +1,26 @@
 <script lang="ts">
 	import logo from "./assets/images/logo-universal.png"
-	import { Greet } from "../wailsjs/go/main/App.js"
+	import { Init, Test, GetLocal } from "../wailsjs/go/valorant/Client"
 
-	let resultText: string = "Please enter your name below 👇"
+	let resultText: string = "Result"
 	let name: string
 
-	function greet(): void {
-		Greet(name).then(result => resultText = result)
+	async function playground() {
+		if (await Init() === false) {
+			resultText = "Init failed"
+			return
+		}
+
+		GetLocal("/chat/v4/presences").then((result) => {
+			if (result === null) {
+				console.error("request failed")
+				return
+			}
+
+			console.log("result:", JSON.parse(result))
+		})
+
+		resultText = await Test()
 	}
 </script>
 
@@ -15,7 +29,7 @@
 	<div class="result" id="result">{resultText}</div>
 	<div class="input-box" id="input">
 		<input autocomplete="off" bind:value={name} class="input" id="name" type="text"/>
-		<button class="btn" on:click={greet}>Greet</button>
+		<button class="btn" on:click={playground}>Play</button>
 	</div>
 </main>
 
