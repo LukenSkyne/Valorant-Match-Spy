@@ -14,7 +14,6 @@ var assets embed.FS
 
 func main() {
 	// Create an instance of the app structure
-	app := NewApp()
 	client := valorant.NewClient()
 	utility := utils.NewUtility()
 
@@ -24,9 +23,8 @@ func main() {
 		Width:     1024,
 		Height:    768,
 		Assets:    assets,
-		OnStartup: app.startup,
+		OnStartup: client.OnStartup,
 		Bind: []interface{}{
-			app,
 			client,
 			utility,
 		},

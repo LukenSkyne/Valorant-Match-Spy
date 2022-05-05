@@ -1,6 +1,7 @@
 package valorant
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -22,6 +23,7 @@ type Credentials struct {
 }
 
 type Client struct {
+	ctx   *context.Context
 	ready bool
 
 	integrationInfo *IntegrationInfo
@@ -39,6 +41,10 @@ func NewClient() *Client {
 		credentials:     &Credentials{},
 		clientInfo:      NewClientInfo(),
 	}
+}
+
+func (c *Client) OnStartup(ctx context.Context) {
+	c.ctx = &ctx
 }
 
 func (c *Client) Init() bool {
