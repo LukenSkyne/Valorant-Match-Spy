@@ -3,11 +3,11 @@
 	//
 	import { WindowSetTitle } from "../wailsjs/runtime"
 	import { ValorantClient } from "./script/ValorantClient"
+	//import { SaveLog } from "../wailsjs/go/utils/Utility"
 	//
 	import Menus from "./components/Menus.svelte"
 	import PreGame from "./components/PreGame.svelte"
 	import InGame from "./components/InGame.svelte"
-	import { SaveLog } from "../wailsjs/go/utils/Utility"
 
 	let name: string
 
@@ -27,37 +27,30 @@
 	}
 
 	async function mainLoop() {
-		console.debug(new Date().toLocaleTimeString(), "mainLoop()")
-
 		if (ready === false && await tryInit() === false) {
 			return
 		}
 
-		await onTickV2()
+		await onTick()
 	}
 
-	async function onTickV2() {
-		console.debug(new Date().toLocaleTimeString(), "onTickV2()")
+	async function onTick() {
+		console.debug(new Date().toLocaleTimeString(), "onTick()")
 
 		const presences = await client.getPresences()
 
 		if (presences !== null) {
-			console.debug("presences:", presences)
 			const selfPresence = presences.find((presence) => presence.puuid === client.selfID)
 
 			if (selfPresence !== undefined) {
 				clientState = selfPresence.private?.sessionLoopState ?? null
-
-				/*if (clientState === "PREGAME") {
-					SaveLog("local_getPresences_pregame", JSON.stringify(presences, null, "\t"))
-				} else if (clientState === "INGAME") {
-					SaveLog("local_getPresences_ingame", JSON.stringify(presences, null, "\t"))
-				}*/
-
 				WindowSetTitle(`Valorant Match Spy - ${clientState}`)
 			}
+
+			//const nameData = await client.getNames(presences.map((p) => p.puuid))
+			//console.log("nameData", nameData)
 		} else {
-			console.debug("presences failed")
+			console.debug(new Date().toLocaleTimeString(), "presences failed")
 
 			clientState = null
 			ready = false
@@ -65,12 +58,13 @@
 	}
 
 	onMount(() => {
-		console.debug("onMount")
+		//console.debug(new Date().toLocaleTimeString(), "onMount")
+		mainLoop()
 		mainLoopHandle = setInterval(mainLoop, 5000)
 	})
 
 	onDestroy(() => {
-		console.debug("onDestroy")
+		//console.debug(new Date().toLocaleTimeString(), "onDestroy")
 		clearInterval(mainLoopHandle)
 	})
 </script>

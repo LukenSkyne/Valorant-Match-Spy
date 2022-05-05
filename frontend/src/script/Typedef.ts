@@ -18,7 +18,6 @@ export type SessionLoopState = "MENUS" | "PREGAME" | "INGAME"
 export type PartyState = "DEFAULT" | "MATCHMAKING" | "MATCHMADE_GAME_STARTING" | "CUSTOM_GAME_SETUP"
 export type QueueID = "spikerush" | "competitive" | "unrated" | "deathmatch" | "onefa" | "ggteam"
 
-
 // interfaces for local
 
 export interface RawPresence {
@@ -83,7 +82,7 @@ export interface PrivateData {
 	tournamentId: string
 }
 
-// interfaces for GLZ and PD
+// interfaces for glz
 
 export interface PlayerData {
 	Subject: string, // uuid
@@ -112,7 +111,7 @@ export interface SeasonalBadgeInfo {
 export interface PreGamePlayer {
 	Subject: string, // uuid
 	CharacterID: string | "",
-	CharacterSelectionState: "",
+	CharacterSelectionState: "" | "selected" | "locked",
 	PregamePlayerState: "joined",
 	CompetitiveTier: number,
 	PlayerIdentity: PlayerIdentity,
@@ -196,4 +195,13 @@ export interface CoreGameMatch {
 		QueueID: QueueID,
 		IsRanked: true
 	}
+}
+
+// interfaces for pd
+
+export interface PlayerName {
+	DisplayName: string | "", // uuid
+	Subject: string, // uuid
+	GameName: string,
+	TagLine: string
 }

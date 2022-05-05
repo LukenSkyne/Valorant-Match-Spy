@@ -21,6 +21,9 @@
 			if (matchID != null) {
 				const matchData = await client.getPreGameMatch(matchID)
 				console.log("matchData:", matchData)
+
+				const loadoutData = await client.getPreGameLoadouts(matchID)
+				console.log("loadoutData:", loadoutData)
 			}
 		}
 	}

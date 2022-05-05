@@ -21,6 +21,9 @@
 			if (matchID != null) {
 				const matchData = await client.getCoreGameMatch(matchID)
 				console.log("matchData:", matchData)
+
+				const loadoutData = await client.getCoreGameLoadouts(matchID)
+				console.log("loadoutData:", loadoutData)
 			}
 		}
 	}
