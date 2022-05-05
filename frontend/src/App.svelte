@@ -11,30 +11,33 @@
 
 	let name: string
 
-	let retryInitHandle: NodeJS.Timeout = null
-	let onTickHandle: NodeJS.Timeout = null
-
 	let ready = false
 	let client: ValorantClient = null
 	let clientState: string = null
 
+	let mainLoopHandle: NodeJS.Timeout = null
+
 	async function tryInit() {
 		console.debug(new Date().toLocaleTimeString(), "tryInit()")
-		ready = false
-		client = new ValorantClient()
 
-		if (await client.init() === false) {
-			retryInitHandle = setTimeout(tryInit, 5000)
+		client = new ValorantClient()
+		ready = await client.init()
+
+		return ready
+	}
+
+	async function mainLoop() {
+		console.debug(new Date().toLocaleTimeString(), "mainLoop()")
+
+		if (ready === false && await tryInit() === false) {
 			return
 		}
 
-		ready = true
-		await onTick()
-		retryInitHandle = null
+		await onTickV2()
 	}
 
-	async function onTick() {
-		console.debug(new Date().toLocaleTimeString(), "onTick()")
+	async function onTickV2() {
+		console.debug(new Date().toLocaleTimeString(), "onTickV2()")
 
 		const presences = await client.getPresences()
 
@@ -57,28 +60,18 @@
 			console.debug("presences failed")
 
 			clientState = null
-			retryInitHandle = setTimeout(tryInit, 5000)
-			return
+			ready = false
 		}
-
-		onTickHandle = setTimeout(onTick, 5000)
 	}
 
 	onMount(() => {
 		console.debug("onMount")
-		tryInit()
+		mainLoopHandle = setInterval(mainLoop, 5000)
 	})
 
 	onDestroy(() => {
 		console.debug("onDestroy")
-
-		if (retryInitHandle !== null) {
-			clearTimeout(retryInitHandle)
-		}
-
-		if (onTickHandle !== null) {
-			clearTimeout(onTickHandle)
-		}
+		clearInterval(mainLoopHandle)
 	})
 </script>
 
