@@ -2,7 +2,7 @@ import { ValorantClientBase } from "./ValorantClientBase"
 import { GetGlz, GetLocal } from "../../wailsjs/go/valorant/Client.js"
 import { SaveLog } from "../../wailsjs/go/utils/Utility.js"
 
-import type { Presence, RawPresence } from "./Typedef"
+import type { Presence, RawPresence, PlayerData, CoreGameMatch, PreGameMatch } from "./Typedef"
 
 export class ValorantClient extends ValorantClientBase {
 
@@ -28,15 +28,11 @@ export class ValorantClient extends ValorantClientBase {
 		return rawPresences as Presence[]
 	}
 
-	async getPreGamePlayerData(playerUUID: string) {
-		const playerData = JSON.parse(await GetGlz(`/pregame/v1/players/${playerUUID}`))
-
-		SaveLog("glz_getPreGamePlayerData", JSON.stringify(playerData, null, "\t"))
-
-		return playerData
+	async getPreGamePlayerData(playerUUID: string): Promise<PlayerData> {
+		return JSON.parse(await GetGlz(`/pregame/v1/players/${playerUUID}`))
 	}
 
-	async getPreGameMatch(matchUUID: string) {
+	async getPreGameMatch(matchUUID: string): Promise<PreGameMatch> {
 		const matchData = JSON.parse(await GetGlz(`/pregame/v1/matches/${matchUUID}`))
 
 		SaveLog("glz_getPreGameMatch", JSON.stringify(matchData, null, "\t"))
@@ -44,15 +40,11 @@ export class ValorantClient extends ValorantClientBase {
 		return matchData
 	}
 
-	async getCoreGamePlayerData(playerUUID: string) {
-		const playerData = JSON.parse(await GetGlz(`/core-game/v1/players/${playerUUID}`))
-
-		SaveLog("glz_getCoreGamePlayerData", JSON.stringify(playerData, null, "\t"))
-
-		return playerData
+	async getCoreGamePlayerData(playerUUID: string): Promise<PlayerData> {
+		return JSON.parse(await GetGlz(`/core-game/v1/players/${playerUUID}`))
 	}
 
-	async getCoreGameMatch(matchUUID: string) {
+	async getCoreGameMatch(matchUUID: string): Promise<CoreGameMatch> {
 		const matchData = JSON.parse(await GetGlz(`/core-game/v1/matches/${matchUUID}`))
 
 		SaveLog("glz_getCoreGameMatch", JSON.stringify(matchData, null, "\t"))
