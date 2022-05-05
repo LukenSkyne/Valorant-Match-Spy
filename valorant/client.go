@@ -27,6 +27,7 @@ type Client struct {
 	ready bool
 
 	integrationInfo *IntegrationInfo
+	integration     *WebSocket
 	credentials     *Credentials
 	clientInfo      *ClientInfo
 
@@ -55,6 +56,19 @@ func (c *Client) Init() bool {
 
 	localHost := fmt.Sprintf("%v://127.0.0.1:%v", c.integrationInfo.Protocol, c.integrationInfo.Port)
 	localAuth := "Basic " + base64.StdEncoding.EncodeToString([]byte("riot:"+c.integrationInfo.Password))
+
+	c.integration = NewWebSocket(*c.ctx)
+	c.integration.Connect(ConnectionInfo{
+		Protocol: "wss",
+		Host:     "localhost",
+		Port:     c.integrationInfo.Port,
+		Auth:     &localAuth,
+		SubscribeToEvents: []string{
+			"OnJsonApiEvent_entitlements_v1_token",
+			"OnJsonApiEvent_chat_v4_presences",
+		},
+	})
+
 	c.local = NewRemote(localHost, func(req *http.Request) {
 		req.Header.Set("Authorization", localAuth)
 	})

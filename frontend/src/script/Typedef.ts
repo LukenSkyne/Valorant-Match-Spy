@@ -1,5 +1,7 @@
 // shared types
 export type Product = "valorant" | "league_of_legends"
+export type EventType = "Update" | "Delete"
+export type WebSocketPayload = [number, string, WebSocketMessage]
 export type PresenceState = "away" | "dnd" | "chat" | "mobile"
 export type CustomGameTeam = "TeamOne" | "TeamTwo" | "TeamSpectate"
 export type GameMap =
@@ -19,6 +21,12 @@ export type PartyState = "DEFAULT" | "MATCHMAKING" | "MATCHMADE_GAME_STARTING" |
 export type QueueID = "spikerush" | "competitive" | "unrated" | "deathmatch" | "onefa" | "ggteam"
 
 // interfaces for local
+
+export interface WebSocketMessage {
+	data: object
+	eventType: EventType
+	uri: string
+}
 
 export interface RawPresence {
 	actor: string | null
