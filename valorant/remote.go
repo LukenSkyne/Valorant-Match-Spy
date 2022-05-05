@@ -1,7 +1,9 @@
 package valorant
 
 import (
+	"bytes"
 	"crypto/tls"
+	"io"
 	"net/http"
 )
 
@@ -25,7 +27,17 @@ func NewRemote(host string, reqIntercept func(req *http.Request)) *Remote {
 }
 
 func (r *Remote) get(url string) (*http.Response, error) {
-	req, err := http.NewRequest("GET", r.host+url, nil)
+	return r.request(http.MethodGet, url, nil)
+}
+
+func (r *Remote) request(method string, url string, payload *string) (*http.Response, error) {
+	var body io.Reader = nil
+
+	if payload != nil {
+		body = bytes.NewBuffer([]byte(*payload))
+	}
+
+	req, err := http.NewRequest(method, r.host+url, body)
 
 	if err != nil {
 		return nil, err

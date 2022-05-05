@@ -41,8 +41,8 @@ func (c *ClientInfo) Read() error {
 
 		if i := strings.Index(line, versionLookup); i != -1 {
 			// line with Version
-			c.Version = strings.TrimSpace(line[i+len(versionLookup):])
-			c.Version = strings.Join(insert(strings.Split(c.Version, "-"), 2, "shipping"), "-")
+			versionNoShipping := strings.TrimSpace(line[i+len(versionLookup):])
+			c.Version = strings.Join(insert(strings.Split(versionNoShipping, "-"), 2, "shipping"), "-")
 
 			fmt.Printf("Version '%v'\n", c.Version)
 		} else if strings.Index(line, "Session_ReConnect") != -1 {
@@ -55,6 +55,10 @@ func (c *ClientInfo) Read() error {
 			c.PdHost = pdRegex.FindString(line)
 
 			fmt.Printf("PdHost '%v'\n", c.PdHost)
+		}
+
+		if c.Version != "" && c.GlzHost != "" && c.PdHost != "" {
+			break
 		}
 	}
 

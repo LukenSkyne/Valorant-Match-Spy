@@ -159,7 +159,7 @@ func extractClaims(tokenString string) (*jwt.MapClaims, error) {
 	return &claims, nil
 }
 
-func (c *Client) getRemotely(r *Remote, url string) *string {
+func (c *Client) requestRemotely(r *Remote, method string, url string, payload *string) *string {
 	if !c.ready {
 		return nil
 	}
@@ -172,7 +172,7 @@ func (c *Client) getRemotely(r *Remote, url string) *string {
 		}
 	}
 
-	resp, err := r.get(url)
+	resp, err := r.request(method, url, payload)
 
 	if err != nil {
 		fmt.Printf("Request Error: %v\n", err.Error())
@@ -204,13 +204,17 @@ func (c *Client) SelfID() *string {
 }
 
 func (c *Client) GetLocal(url string) *string {
-	return c.getRemotely(c.local, url)
+	return c.requestRemotely(c.local, http.MethodGet, url, nil)
 }
 
 func (c *Client) GetGlz(url string) *string {
-	return c.getRemotely(c.glz, url)
+	return c.requestRemotely(c.glz, http.MethodGet, url, nil)
 }
 
 func (c *Client) GetPd(url string) *string {
-	return c.getRemotely(c.pd, url)
+	return c.requestRemotely(c.pd, http.MethodGet, url, nil)
+}
+
+func (c *Client) PutPd(url string, payload string) *string {
+	return c.requestRemotely(c.pd, http.MethodPut, url, &payload)
 }
