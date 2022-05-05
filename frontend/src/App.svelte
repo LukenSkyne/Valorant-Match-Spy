@@ -1,93 +1,105 @@
 <script lang="ts">
-	import logo from "./assets/images/logo-universal.png"
-	import { Init, Test, GetLocal } from "../wailsjs/go/valorant/Client"
+	import { onMount, onDestroy } from "svelte"
+	//
+	import { WindowSetTitle } from "../wailsjs/runtime"
+	import { ValorantClient } from "./script/ValorantClient"
+	//
+	import Menus from "./components/Menus.svelte"
+	import PreGame from "./components/PreGame.svelte"
+	import InGame from "./components/InGame.svelte"
+	import { SaveLog } from "../wailsjs/go/utils/Utility"
 
-	let resultText: string = "Result"
 	let name: string
 
-	async function playground() {
-		if (await Init() === false) {
-			resultText = "Init failed"
+	let retryInitHandle: NodeJS.Timeout = null
+	let onTickHandle: NodeJS.Timeout = null
+
+	let ready = false
+	let client: ValorantClient = null
+	let clientState: string = null
+
+	async function tryInit() {
+		console.debug(new Date().toLocaleTimeString(), "tryInit()")
+		ready = false
+		client = new ValorantClient()
+
+		if (await client.init() === false) {
+			retryInitHandle = setTimeout(tryInit, 5000)
 			return
 		}
 
-		GetLocal("/chat/v4/presences").then((result) => {
-			if (result === null) {
-				console.error("request failed")
-				return
-			}
-
-			console.log("result:", JSON.parse(result))
-		})
-
-		resultText = await Test()
+		ready = true
+		await onTick()
+		retryInitHandle = null
 	}
+
+	async function onTick() {
+		console.debug(new Date().toLocaleTimeString(), "onTick()")
+
+		const presences = await client.getPresences()
+
+		if (presences !== null) {
+			console.debug("presences:", presences)
+			const selfPresence = presences.find((presence) => presence.puuid === client.selfID)
+
+			if (selfPresence !== undefined) {
+				clientState = selfPresence.private?.sessionLoopState ?? null
+
+				/*if (clientState === "PREGAME") {
+					SaveLog("local_getPresences_pregame", JSON.stringify(presences, null, "\t"))
+				} else if (clientState === "INGAME") {
+					SaveLog("local_getPresences_ingame", JSON.stringify(presences, null, "\t"))
+				}*/
+
+				WindowSetTitle(`Valorant Match Spy - ${clientState}`)
+			}
+		} else {
+			console.debug("presences failed")
+
+			clientState = null
+			retryInitHandle = setTimeout(tryInit, 5000)
+			return
+		}
+
+		onTickHandle = setTimeout(onTick, 5000)
+	}
+
+	onMount(() => {
+		console.debug("onMount")
+		tryInit()
+	})
+
+	onDestroy(() => {
+		console.debug("onDestroy")
+
+		if (retryInitHandle !== null) {
+			clearTimeout(retryInitHandle)
+		}
+
+		if (onTickHandle !== null) {
+			clearTimeout(onTickHandle)
+		}
+	})
 </script>
 
 <main>
-	<img alt="Wails logo" id="logo" src="{logo}">
-	<div class="result" id="result">{resultText}</div>
-	<div class="input-box" id="input">
-		<input autocomplete="off" bind:value={name} class="input" id="name" type="text"/>
-		<button class="btn" on:click={playground}>Play</button>
-	</div>
+	{#if clientState === null}
+		{#if ready === false}
+			<span>Waiting for Valorant to Start...</span>
+		{:else}
+			<span>Valorant is Starting...</span>
+		{/if}
+	{:else}
+		{#if clientState === "MENUS"}
+			<Menus client="{client}" />
+		{:else if clientState === "PREGAME"}
+			<PreGame client="{client}" />
+		{:else if clientState === "INGAME"}
+			<InGame client="{client}" />
+		{/if}
+	{/if}
 </main>
 
 <style>
-
-    #logo {
-        display: block;
-        width: 50%;
-        height: 50%;
-        margin: auto;
-        padding: 10% 0 0;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: 100% 100%;
-        background-origin: content-box;
-    }
-
-    .result {
-        height: 20px;
-        line-height: 20px;
-        margin: 1.5rem auto;
-    }
-
-    .input-box .btn {
-        width: 60px;
-        height: 30px;
-        line-height: 30px;
-        border-radius: 3px;
-        border: none;
-        margin: 0 0 0 20px;
-        padding: 0 8px;
-        cursor: pointer;
-    }
-
-    .input-box .btn:hover {
-        background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
-        color: #333333;
-    }
-
-    .input-box .input {
-        border: none;
-        border-radius: 3px;
-        outline: none;
-        height: 30px;
-        line-height: 30px;
-        padding: 0 10px;
-        background-color: rgba(240, 240, 240, 1);
-        -webkit-font-smoothing: antialiased;
-    }
-
-    .input-box .input:hover {
-        border: none;
-        background-color: rgba(255, 255, 255, 1);
-    }
-
-    .input-box .input:focus {
-        border: none;
-        background-color: rgba(255, 255, 255, 1);
-    }
 
 </style>

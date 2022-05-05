@@ -24,3 +24,39 @@ body {
     height: 100vh;
     text-align: center;
 }
+
+.container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    color: white;
+
+    background-color: hsl(220, 50%, 13%);
+    background-size: cover;
+    background-position: center;
+}
+
+.btn {
+    width: 60px;
+    height: 30px;
+    line-height: 30px;
+    border-radius: 3px;
+    border: none;
+    margin: 0 0 0 20px;
+    padding: 0 8px;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
+    color: #333333;
+}
+
+.btn:active:hover {
+    background-image: linear-gradient(to top, #a5c7dc 0%, #c2ddec 100%);
+}

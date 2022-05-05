@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"match-spy/utils"
 	"match-spy/valorant"
 
 	"github.com/wailsapp/wails/v2"
@@ -15,6 +16,7 @@ func main() {
 	// Create an instance of the app structure
 	app := NewApp()
 	client := valorant.NewClient()
+	utility := utils.NewUtility()
 
 	// Create application with options
 	err := wails.Run(&options.App{
@@ -26,6 +28,7 @@ func main() {
 		Bind: []interface{}{
 			app,
 			client,
+			utility,
 		},
 	})
 

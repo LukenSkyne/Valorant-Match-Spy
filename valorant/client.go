@@ -102,6 +102,10 @@ func (c *Client) fetchCredentials() error {
 }
 
 func (c *Client) getRemotely(r *Remote, url string) *string {
+	if !c.ready {
+		return nil
+	}
+
 	resp, err := r.get(url)
 
 	if err != nil {
@@ -123,6 +127,16 @@ func (c *Client) getRemotely(r *Remote, url string) *string {
 	return &response
 }
 
+func (c *Client) SelfID() *string {
+	if !c.ready {
+		return nil
+	}
+
+	uuid := c.credentials.Subject
+
+	return &uuid
+}
+
 func (c *Client) GetLocal(url string) *string {
 	return c.getRemotely(c.local, url)
 }
@@ -133,14 +147,4 @@ func (c *Client) GetGlz(url string) *string {
 
 func (c *Client) GetPd(url string) *string {
 	return c.getRemotely(c.pd, url)
-}
-
-func (c *Client) Test() *string {
-	if !c.ready {
-		return nil
-	}
-
-	txt := "It works!"
-
-	return &txt
 }
