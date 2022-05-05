@@ -2,7 +2,10 @@ module match-spy
 
 go 1.17
 
-require github.com/wailsapp/wails/v2 v2.0.0-beta.36
+require (
+	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/wailsapp/wails/v2 v2.0.0-beta.36
+)
 
 require (
 	github.com/go-ole/go-ole v1.2.6 // indirect

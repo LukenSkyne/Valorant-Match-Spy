@@ -3,9 +3,12 @@ package valorant
 import (
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"github.com/golang-jwt/jwt"
 	"io"
 	"net/http"
+	"time"
 )
 
 type Credentials struct {
@@ -14,6 +17,8 @@ type Credentials struct {
 	Issuer       string   `json:"issuer"`
 	Subject      string   `json:"subject"`
 	Token        string   `json:"token"`
+	IssuedAt     time.Time
+	ExpiresAt    time.Time
 }
 
 type Client struct {
@@ -49,40 +54,20 @@ func (c *Client) Init() bool {
 	})
 
 	if err := c.clientInfo.Read(); err != nil {
-		fmt.Println("Reading ClientInfo failed")
+		fmt.Println("Reading ClientInfo failed:", err.Error())
 		return false
 	}
 
 	if err := c.fetchCredentials(); err != nil {
-		fmt.Println("Fetching Credentials failed")
+		fmt.Println("Fetching Credentials failed:", err.Error())
 		return false
 	}
 
-	c.buildRemotes()
+	fmt.Println("Credentials::iat", c.credentials.IssuedAt)
+	fmt.Println("Credentials::exp", c.credentials.ExpiresAt)
 
 	c.ready = true
 	return true
-}
-
-func (c *Client) buildRemotes() {
-	platformDetails := map[string]string{
-		"platformType":      "PC",
-		"platformOS":        "Windows",
-		"platformOSVersion": "10.0.19042.1.256.64bit",
-		"platformChipset":   "Unknown",
-	}
-	platformJSON, _ := json.Marshal(platformDetails)
-	platform := base64.StdEncoding.EncodeToString(platformJSON)
-	interceptor := func(req *http.Request) {
-		req.Header.Set("Authorization", "Bearer "+c.credentials.AccessToken)
-		req.Header.Set("X-Riot-Entitlements-JWT", c.credentials.Token)
-		req.Header.Set("X-Riot-ClientPlatform", platform)
-		req.Header.Set("X-Riot-ClientVersion", c.clientInfo.Version)
-		req.Header.Set("User-Agent", "ShooterGame/13 Windows/10.0.19043.1.256.64bit")
-	}
-
-	c.glz = NewRemote(c.clientInfo.GlzHost, interceptor)
-	c.pd = NewRemote(c.clientInfo.PdHost, interceptor)
 }
 
 func (c *Client) fetchCredentials() error {
@@ -98,12 +83,93 @@ func (c *Client) fetchCredentials() error {
 		return err
 	}
 
+	if err := c.parseCredentials(); err != nil {
+		return err
+	}
+
+	c.buildRemotes()
+
 	return nil
+}
+
+func (c *Client) buildRemotes() {
+	platformDetails := map[string]string{
+		"platformType":      "PC",
+		"platformOS":        "Windows",
+		"platformOSVersion": "10.0.22000.1.256.64bit",
+		"platformChipset":   "Unknown",
+	}
+	platformJSON, _ := json.Marshal(platformDetails)
+	platform := base64.StdEncoding.EncodeToString(platformJSON)
+	interceptor := func(req *http.Request) {
+		req.Header.Set("Authorization", "Bearer "+c.credentials.AccessToken)
+		req.Header.Set("X-Riot-Entitlements-JWT", c.credentials.Token)
+		req.Header.Set("X-Riot-ClientPlatform", platform)
+		req.Header.Set("X-Riot-ClientVersion", c.clientInfo.Version)
+		req.Header.Set("User-Agent", "ShooterGame/13 Windows/10.0.22000.1.256.64bit")
+	}
+
+	c.glz = NewRemote(c.clientInfo.GlzHost, interceptor)
+	c.pd = NewRemote(c.clientInfo.PdHost, interceptor)
+}
+
+func (c *Client) parseCredentials() error {
+	claims, err := extractClaims(c.credentials.AccessToken)
+
+	if err != nil {
+		return err
+	}
+
+	iatRaw := (*claims)["iat"]
+
+	switch iatRaw.(type) {
+	case float64:
+		c.credentials.IssuedAt = time.Unix(int64(iatRaw.(float64)), 0)
+		break
+	default:
+		return errors.New("unexpected type for iat")
+	}
+
+	expRaw := (*claims)["exp"]
+
+	switch expRaw.(type) {
+	case float64:
+		c.credentials.ExpiresAt = time.Unix(int64(expRaw.(float64)), 0)
+		break
+	default:
+		return errors.New("unexpected type for exp")
+	}
+
+	return nil
+}
+
+func extractClaims(tokenString string) (*jwt.MapClaims, error) {
+	token, _, err := new(jwt.Parser).ParseUnverified(tokenString, jwt.MapClaims{})
+
+	if err != nil {
+		return nil, err
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+
+	if !ok {
+		return nil, err
+	}
+
+	return &claims, nil
 }
 
 func (c *Client) getRemotely(r *Remote, url string) *string {
 	if !c.ready {
 		return nil
+	}
+
+	if c.credentials.ExpiresAt.Sub(time.Now()) < time.Second*30 {
+		fmt.Println("token is about to expire, refreshing client")
+
+		if err := c.fetchCredentials(); err != nil {
+			fmt.Println("refreshing credentials failed:", err.Error())
+		}
 	}
 
 	resp, err := r.get(url)
