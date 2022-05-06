@@ -1,7 +1,6 @@
+
 html {
-    background-color: rgba(27, 38, 54, 1);
-    text-align: center;
-    color: white;
+    background-color: #222222;
 }
 
 body {
@@ -22,7 +21,6 @@ body {
 
 #app {
     height: 100vh;
-    text-align: center;
 }
 
 .container {
@@ -34,11 +32,9 @@ body {
     align-items: center;
     justify-content: center;
 
-    color: white;
-
-    background-color: hsl(220, 50%, 13%);
-    background-size: cover;
-    background-position: center;
+    /*background-color: hsl(220, 50%, 13%);*/
+    /*background-size: cover;*/
+    /*background-position: center;*/
 }
 
 .btn {

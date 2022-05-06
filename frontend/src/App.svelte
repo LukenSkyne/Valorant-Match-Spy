@@ -1,22 +1,23 @@
 <script lang="ts">
 	import { onMount, onDestroy } from "svelte"
+	import type { Unsubscriber } from "svelte/store"
 	//
 	import { EventsOff, EventsOnMultiple, WindowSetTitle } from "../wailsjs/runtime"
 	import { ValorantClient } from "./script/ValorantClient"
 	import { SaveLog } from "../wailsjs/go/utils/Utility"
 	//
-	import Menus from "./components/Menus.svelte"
-	import PreGame from "./components/PreGame.svelte"
-	import InGame from "./components/InGame.svelte"
 	import type { RawPresence, WebSocketPayload } from "./script/Typedef"
+	//
+	import Menus from "./components/Menus.svelte"
+	import InGame from "./components/InGame.svelte"
+	//
+	import { ClientState, Presences } from "./stores/Data"
 
-	let name: string
+	let ready: boolean
+	let client: ValorantClient
 
-	let ready = false
-	let client: ValorantClient = null
-	let clientState: string = null
-
-	let mainLoopHandle: NodeJS.Timeout = null
+	let initLoopHandle: NodeJS.Timeout = null
+	let unsubscribeClientState: Unsubscriber
 
 	async function tryInit() {
 		console.debug(new Date().toLocaleTimeString(), "tryInit()")
@@ -27,41 +28,41 @@
 		return ready
 	}
 
-	async function mainLoop() {
-		if (ready === false && await tryInit() === false) {
+	async function initLoop() {
+		if (await tryInit() === false) {
 			return
 		}
 
-		await onTick()
+		clearInterval(initLoopHandle)
+		initLoopHandle = null
+
+		await syncWithClient()
 	}
 
-	async function onTick() {
-		//console.debug(new Date().toLocaleTimeString(), "onTick()")
-
+	async function syncWithClient() {
 		const presences = await client.getPresences()
 
-		if (presences !== null) {
-			const selfPresence = presences.find((presence) => presence.puuid === client.selfID)
-
-			if (selfPresence !== undefined) {
-				clientState = selfPresence.private?.sessionLoopState ?? null
-				WindowSetTitle(`Valorant Match Spy - ${clientState}`)
-			}
-
-			//const nameData = await client.getNames(presences.map((p) => p.puuid))
-			//console.log("nameData", nameData)
-		} else {
-			console.debug(new Date().toLocaleTimeString(), "presences failed")
-
-			clientState = null
-			ready = false
+		if (presences === null) {
+			return
 		}
+
+		console.debug("syncing presences")
+		$Presences = presences
+
+		const selfPresence = presences.find((presence) => presence.puuid === client.selfID)
+
+		if (selfPresence === undefined) {
+			return
+		}
+
+		console.debug("syncing client state")
+		$ClientState = selfPresence.private.sessionLoopState
 	}
 
 	onMount(() => {
 		//console.debug(new Date().toLocaleTimeString(), "onMount")
-		mainLoop()
-		mainLoopHandle = setInterval(mainLoop, 5000)
+		initLoop()
+		initLoopHandle = setInterval(initLoop, 5000)
 
 		EventsOnMultiple("WS", (data) => {
 			if (data === "") {
@@ -71,37 +72,77 @@
 			const [, eventName, payload] = JSON.parse(data) as WebSocketPayload
 
 			if (eventName === "OnJsonApiEvent_chat_v4_presences") {
-				const presences: RawPresence[] = payload.data["presences"]
+				const rawPresences: RawPresence[] = payload.data["presences"]
+				const newPresences = client.processPresences(rawPresences)
 
-				console.debug("WS chat_v4_presences:", payload.eventType, presences)
+				for (const newPresence of newPresences) {
+					const i = $Presences.findIndex((p) => p.puuid === newPresence.puuid)
+
+					if (i === -1) {
+						$Presences.push(newPresence)
+					} else if (payload.eventType === "Delete") {
+						$Presences.splice(i, 1)
+					} else {
+						$Presences.splice(i, 1, newPresence)
+					}
+				}
+
+				$Presences = $Presences // explicit update
+
+				console.debug("WS chat_v4_presences:", payload.eventType, newPresences)
+				console.debug("$Presences:", $Presences)
+
+				const selfPresence = $Presences.find((presence) => presence.puuid === client.selfID)
+
+				if (selfPresence === undefined) {
+					return
+				}
+
+				const newClientState = selfPresence.private.sessionLoopState
+
+				if ($ClientState !== newClientState) {
+					$ClientState = newClientState
+					console.debug("$ClientState update through WS", $ClientState)
+				}
 			} else if (eventName === "OnJsonApiEvent_entitlements_v1_token") {
 				console.debug("WS entitlements_v1_token:", payload)
 				SaveLog("WS_" + eventName.replace("OnJsonApiEvent_", ""), JSON.stringify(payload, null, "\t"))
+			} else if (eventName === "OnJsonApiEvent_riot-client-lifecycle-state_v1_state") {
+				console.debug("WS riot-client-lifecycle-state_v1_state:", payload)
+				SaveLog("WS_" + eventName.replace("OnJsonApiEvent_", ""), JSON.stringify(payload, null, "\t"))
 			}
 		}, -1)
+
+		unsubscribeClientState = ClientState.subscribe((value) => {
+			console.log("ClientState changed:", value)
+
+			if (value !== null) {
+				WindowSetTitle(`Valorant Match Spy - ${value}`)
+			} else {
+				WindowSetTitle("Valorant Match Spy")
+			}
+		})
 	})
 
 	onDestroy(() => {
 		//console.debug(new Date().toLocaleTimeString(), "onDestroy")
-		clearInterval(mainLoopHandle)
-
+		clearInterval(initLoopHandle)
 		EventsOff("WS")
+		unsubscribeClientState()
 	})
 </script>
 
-<main>
-	{#if clientState === null}
+<main class="container">
+	{#if $ClientState === null}
 		{#if ready === false}
 			<span>Waiting for Valorant to Start...</span>
 		{:else}
 			<span>Valorant is Starting...</span>
 		{/if}
 	{:else}
-		{#if clientState === "MENUS"}
+		{#if $ClientState === "MENUS"}
 			<Menus client="{client}" />
-		{:else if clientState === "PREGAME"}
-			<PreGame client="{client}" />
-		{:else if clientState === "INGAME"}
+		{:else if ($ClientState === "INGAME" || $ClientState === "PREGAME")}
 			<InGame client="{client}" />
 		{/if}
 	{/if}

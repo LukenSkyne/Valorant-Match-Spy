@@ -1,15 +1,27 @@
 <script lang="ts">
 	import { ValorantClient } from "../script/ValorantClient"
-	import { onMount } from "svelte"
+	import { onDestroy, onMount } from "svelte"
+	import type { Unsubscriber } from "svelte/store"
+	//
+	import { Presences } from "../stores/Data"
 
+	// props
 	export let client: ValorantClient
 
+	// members
+	let unsubscribePresences: Unsubscriber
+
 	onMount(() => {
-		console.log("client", client)
+		unsubscribePresences = Presences.subscribe((value) => {
+			console.log("Menus | Presences updated:", value)
+		})
+	})
+
+	onDestroy(() => {
+		unsubscribePresences()
 	})
 </script>
 
 <main class="container">
 	<span>In MENUS</span>
-	<span>SelfID: {client?.selfID}</span>
 </main>

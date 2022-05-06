@@ -6,26 +6,29 @@ import type { Presence, RawPresence, PlayerData, CoreGameMatch, PreGameMatch, Pl
 
 export class ValorantClient extends ValorantClientBase {
 
+	processPresences(rawPresences: RawPresence[]): Presence[] {
+		const presences: Presence[] = []
+
+		for (const rawPresence of rawPresences as RawPresence[]) {
+			const hasPrivate = rawPresence.private !== null && rawPresence.product === "valorant"
+
+			presences.push({
+				...rawPresence,
+				private: hasPrivate ? JSON.parse(atob(rawPresence.private)) : null
+			})
+		}
+
+		return presences
+	}
+
 	async getPresences(): Promise<Presence[]> {
-		const rawPresences: RawPresence[] | Presence[] = JSON.parse(await GetLocal("/chat/v4/presences"))?.["presences"]
+		const rawPresences: RawPresence[] = JSON.parse(await GetLocal("/chat/v4/presences"))?.["presences"]
 
 		if (rawPresences === undefined) {
 			return null
 		}
 
-		for (const presence of rawPresences as RawPresence[]) {
-			if (presence.private === null || presence.product !== "valorant") {
-				continue
-			}
-
-			try {
-				presence.private = JSON.parse(atob(presence.private))
-			} catch (e) {
-				console.error("Decoding presence failed: ", presence.private)
-			}
-		}
-
-		return rawPresences as Presence[]
+		return this.processPresences(rawPresences)
 	}
 
 	async getNames(playerUUIDs: string[]): Promise<PlayerName[]> {
