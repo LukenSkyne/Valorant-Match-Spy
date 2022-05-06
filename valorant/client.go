@@ -73,10 +73,11 @@ func (c *Client) Init() bool {
 		SubscribeToEvents: []string{
 			"OnJsonApiEvent_entitlements_v1_token",
 			"OnJsonApiEvent_chat_v4_presences",
+			"OnJsonApiEvent_riot-client-lifecycle-state_v1_state",
 		},
 	})
 
-	c.local = NewRemote(localHost, func(req *http.Request) {
+	c.local = NewRemote(c.log, localHost, func(req *http.Request) {
 		req.Header.Set("Authorization", localAuth)
 	})
 
@@ -95,7 +96,8 @@ func (c *Client) Init() bool {
 		return false
 	}
 
-	c.log.Infow("Credentials", "Subject", c.credentials.Subject,
+	c.log.Infow("Credentials",
+		"Subject", c.credentials.Subject,
 		"IssuedAt", c.credentials.IssuedAt,
 		"ExpiresAt", c.credentials.ExpiresAt)
 
@@ -142,8 +144,8 @@ func (c *Client) buildRemotes() {
 		req.Header.Set("User-Agent", "ShooterGame/13 Windows/10.0.22000.1.256.64bit")
 	}
 
-	c.glz = NewRemote(c.clientInfo.GlzHost, interceptor)
-	c.pd = NewRemote(c.clientInfo.PdHost, interceptor)
+	c.glz = NewRemote(c.log, c.clientInfo.GlzHost, interceptor)
+	c.pd = NewRemote(c.log, c.clientInfo.PdHost, interceptor)
 }
 
 func (c *Client) parseCredentials() error {
@@ -208,7 +210,7 @@ func (c *Client) requestRemotely(r *Remote, method string, url string, payload *
 	resp, err := r.request(method, url, payload)
 
 	if err != nil {
-		fmt.Printf("Request Error: %v\n", err.Error())
+		c.log.Errorf("Request Error: %v", err.Error())
 		return nil
 	}
 
@@ -217,7 +219,7 @@ func (c *Client) requestRemotely(r *Remote, method string, url string, payload *
 	bodyBytes, err := io.ReadAll(resp.Body)
 
 	if err != nil {
-		fmt.Printf("Request Reading Stream: %v\n", err.Error())
+		c.log.Fatalf("Reading Response Stream: %v", err.Error())
 		return nil
 	}
 
