@@ -43,18 +43,12 @@ func (c *ClientInfo) Read() error {
 			// line with Version
 			versionNoShipping := strings.TrimSpace(line[i+len(versionLookup):])
 			c.Version = strings.Join(insert(strings.Split(versionNoShipping, "-"), 2, "shipping"), "-")
-
-			fmt.Printf("Version '%v'\n", c.Version)
 		} else if strings.Index(line, "Session_ReConnect") != -1 {
 			// line with glz host
 			c.GlzHost = glzRegex.FindString(line)
-
-			fmt.Printf("GlzHost '%v'\n", c.GlzHost)
 		} else if strings.Index(line, "AccountXP_GetPlayer") != -1 {
 			// line with pd host
 			c.PdHost = pdRegex.FindString(line)
-
-			fmt.Printf("PdHost '%v'\n", c.PdHost)
 		}
 
 		if c.Version != "" && c.GlzHost != "" && c.PdHost != "" {
@@ -62,11 +56,7 @@ func (c *ClientInfo) Read() error {
 		}
 	}
 
-	if err := scanner.Err(); err != nil {
-		fmt.Printf("Scanner Error: %v", err.Error())
-	}
-
-	return nil
+	return scanner.Err()
 }
 
 // utility function to insert an element into a slice @ index

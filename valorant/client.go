@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt"
+	"go.uber.org/zap"
 	"io"
 	"net/http"
 	"time"
@@ -24,6 +25,7 @@ type Credentials struct {
 
 type Client struct {
 	ctx   *context.Context
+	log   *zap.SugaredLogger
 	ready bool
 
 	integrationInfo *IntegrationInfo
@@ -36,8 +38,9 @@ type Client struct {
 	pd    *Remote
 }
 
-func NewClient() *Client {
+func NewClient(log *zap.SugaredLogger) *Client {
 	return &Client{
+		log:             log,
 		integrationInfo: NewIntegrationInfo(),
 		credentials:     &Credentials{},
 		clientInfo:      NewClientInfo(),
@@ -50,14 +53,18 @@ func (c *Client) OnStartup(ctx context.Context) {
 
 func (c *Client) Init() bool {
 	if err := c.integrationInfo.Read(); err != nil {
-		fmt.Println("Reading IntegrationInfo failed")
+		c.log.Info("Reading IntegrationInfo failed")
 		return false
 	}
+
+	c.log.Infow("Integration Info",
+		"Port", c.integrationInfo.Port,
+		"Password", c.integrationInfo.Password)
 
 	localHost := fmt.Sprintf("%v://127.0.0.1:%v", c.integrationInfo.Protocol, c.integrationInfo.Port)
 	localAuth := "Basic " + base64.StdEncoding.EncodeToString([]byte("riot:"+c.integrationInfo.Password))
 
-	c.integration = NewWebSocket(*c.ctx)
+	c.integration = NewWebSocket(c.log, *c.ctx)
 	c.integration.Connect(ConnectionInfo{
 		Protocol: "wss",
 		Host:     "localhost",
@@ -74,17 +81,23 @@ func (c *Client) Init() bool {
 	})
 
 	if err := c.clientInfo.Read(); err != nil {
-		fmt.Println("Reading ClientInfo failed:", err.Error())
+		c.log.Errorf("Reading ClientInfo failed: %v", err.Error())
 		return false
 	}
+
+	c.log.Infow("Client Info",
+		"Version", c.clientInfo.Version,
+		"GlzHost", c.clientInfo.GlzHost,
+		"PdHost", c.clientInfo.PdHost)
 
 	if err := c.fetchCredentials(); err != nil {
-		fmt.Println("Fetching Credentials failed:", err.Error())
+		c.log.Errorf("Fetching Credentials failed: %v", err.Error())
 		return false
 	}
 
-	fmt.Println("Credentials::iat", c.credentials.IssuedAt)
-	fmt.Println("Credentials::exp", c.credentials.ExpiresAt)
+	c.log.Infow("Credentials", "Subject", c.credentials.Subject,
+		"IssuedAt", c.credentials.IssuedAt,
+		"ExpiresAt", c.credentials.ExpiresAt)
 
 	c.ready = true
 	return true
@@ -185,10 +198,10 @@ func (c *Client) requestRemotely(r *Remote, method string, url string, payload *
 	}
 
 	if c.credentials.ExpiresAt.Sub(time.Now()) < time.Second*30 {
-		fmt.Println("token is about to expire, refreshing client")
+		c.log.Info("Refreshing credentials (token expires shortly)")
 
 		if err := c.fetchCredentials(); err != nil {
-			fmt.Println("refreshing credentials failed:", err.Error())
+			c.log.Fatalf("Refreshing credentials failed: %v", err.Error())
 		}
 	}
 

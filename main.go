@@ -2,20 +2,29 @@ package main
 
 import (
 	"embed"
+	"go.uber.org/zap/zapcore"
 	"match-spy/utils"
 	"match-spy/valorant"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
+	"go.uber.org/zap"
 )
 
 //go:embed frontend/dist
 var assets embed.FS
 
 func main() {
-	// Create an instance of the app structure
-	client := valorant.NewClient()
-	utility := utils.NewUtility()
+	config := zap.NewDevelopmentConfig()
+	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+	logger, _ := config.Build()
+	defer logger.Sync()
+	log := logger.Sugar()
+
+	client := valorant.NewClient(log)
+	utility := utils.NewUtility(log)
+
+	log.Info("Starting app")
 
 	// Create application with options
 	err := wails.Run(&options.App{
@@ -31,6 +40,6 @@ func main() {
 	})
 
 	if err != nil {
-		println("Error:", err)
+		log.Fatalf("Error running app: %v", err.Error())
 	}
 }

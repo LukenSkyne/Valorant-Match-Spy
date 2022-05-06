@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
+	"go.uber.org/zap"
 	"net/http"
+	"strings"
 )
 
 type ConnectionInfo struct {
@@ -18,11 +20,13 @@ type ConnectionInfo struct {
 }
 
 type WebSocket struct {
+	log *zap.SugaredLogger
 	ctx context.Context
 }
 
-func NewWebSocket(ctx context.Context) *WebSocket {
+func NewWebSocket(log *zap.SugaredLogger, ctx context.Context) *WebSocket {
 	return &WebSocket{
+		log: log,
 		ctx: ctx,
 	}
 }
@@ -45,7 +49,7 @@ func (w *WebSocket) Connect(ci ConnectionInfo) {
 	conn, _, err := dialer.Dial(addr, header) // ignore response since it is guaranteed to be an upgrade if it succeeds
 
 	if err != nil {
-		fmt.Println("dial:", err)
+		w.log.Fatalf("WebSocket dial error: %v", err.Error())
 
 		return
 	}
@@ -53,41 +57,47 @@ func (w *WebSocket) Connect(ci ConnectionInfo) {
 	go func() {
 		for _, eventName := range ci.SubscribeToEvents {
 			msg := fmt.Sprintf("[5, \"%v\"]", eventName)
-
-			fmt.Println("Subscribing to:", eventName, msg)
+			w.log.Debugw("WebSocket subscription", "Event", eventName, "Message", msg)
 
 			if err := conn.WriteMessage(1, []byte(msg)); err != nil {
-				fmt.Println("WriteMessage error:", err.Error())
+				w.log.Errorf("WriteMessage: %v", err.Error())
+
 				return
 			}
 		}
 
-		fmt.Println("WebSocket Client listening")
+		w.log.Info("WebSocket listening")
 
 		for true {
 			var messageBuffer []byte
 			msgType, messageBuffer, err := conn.ReadMessage()
 
 			if msgType == -1 {
-				fmt.Println("Closing Connection")
+				w.log.Info("WebSocket closed")
 				break
 			} else if msgType != websocket.TextMessage {
-				fmt.Println("Invalid msgType:", msgType)
+				w.log.Debugf("Invalid msgType: %v", msgType)
 				continue
 			}
 
 			if err != nil {
-				fmt.Println("conn.ReadMessage error:", err.Error())
+				w.log.Errorf("ReadMessage: %v", err.Error())
 				break
 			}
 
 			message := string(messageBuffer)
 
 			if message == "" {
+				w.log.Debug("WebSocket subscription successful")
 				continue
 			}
 
-			fmt.Println("WebSocket message:", message)
+			if split := strings.SplitN(message, "\"", 3); len(split) > 1 {
+				w.log.Debugf("WebSocket message: %v", split[1])
+			} else {
+				w.log.Errorf("Invalid WebSocket message: %v", message)
+			}
+
 			runtime.EventsEmit(w.ctx, "WS", message)
 		}
 

@@ -2,15 +2,19 @@ package utils
 
 import (
 	"fmt"
+	"go.uber.org/zap"
 	"os"
 	"time"
 )
 
 type Utility struct {
+	log *zap.SugaredLogger
 }
 
-func NewUtility() *Utility {
-	return &Utility{}
+func NewUtility(log *zap.SugaredLogger) *Utility {
+	return &Utility{
+		log: log,
+	}
 }
 
 func (u *Utility) SaveLog(name string, content string) {
@@ -18,9 +22,9 @@ func (u *Utility) SaveLog(name string, content string) {
 	fileName := fmt.Sprintf("%v_%v.json", t.Format("2006.01.02_15-04-05"), name)
 	filePath := fmt.Sprintf("C:/Users/Luken/Downloads/requests/%v", fileName)
 
-	fmt.Printf("Saving Log: %v\n", fileName)
+	u.log.Infof("Saving Log: %v", fileName)
 
 	if err := os.WriteFile(filePath, []byte(content), 0644); err != nil {
-		fmt.Printf("Error Writing to file: %v\n", err.Error())
+		u.log.Errorf("Error Writing to file: %v", err.Error())
 	}
 }
