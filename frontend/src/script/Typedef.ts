@@ -111,7 +111,7 @@ export interface PlayerIdentity {
 export interface SeasonalBadgeInfo {
 	SeasonID: string, // uuid
 	NumberOfWins: number,
-	WinsByTier: {},
+	WinsByTier: WinsByTier,
 	Rank: number,
 	LeaderboardRank: number
 }
@@ -212,4 +212,71 @@ export interface PlayerName {
 	Subject: string, // uuid
 	GameName: string,
 	TagLine: string
+}
+
+export interface PlayerMMR {
+	Version: number, // timestamp of last mmr change
+	Subject: string, // uuid
+	NewPlayerExperienceFinished: boolean,
+	QueueSkills: QueueSkillOverview,
+	LatestCompetitiveUpdate: CompetitiveUpdate,
+	IsLeaderboardAnonymized: boolean,
+	IsActRankBadgeHidden: boolean,
+}
+
+export interface QueueSkillOverview {
+	competitive: QueueSkill,
+	custom: QueueSkill,
+	deathmatch: QueueSkill,
+	ggteam: QueueSkill,
+	newmap: QueueSkill,
+	onefa: QueueSkill,
+	seeding: QueueSkill,
+	spikerush: QueueSkill,
+	unrated: QueueSkill,
+}
+
+export interface QueueSkill {
+	TotalGamesNeededForRating: number,
+	TotalGamesNeededForLeaderboard: number,
+	CurrentSeasonGamesNeededForRating: number,
+	SeasonalInfoBySeasonID: SeasonalInfoMap,
+}
+
+export interface SeasonalInfoMap {
+	[key: string]: SeasonalInfo,
+}
+
+export interface SeasonalInfo {
+	SeasonID: string, // uuid
+	NumberOfWins: number,
+	NumberOfWinsWithPlacements: number,
+	NumberOfGames: number,
+	Rank: number,
+	CapstoneWins: number,
+	LeaderboardRank: number,
+	CompetitiveTier: number,
+	RankedRating: number,
+	WinsByTier: WinsByTier,
+	GamesNeededForRating: number,
+	TotalWinsNeededForRank: number,
+}
+
+export interface WinsByTier {
+	[tier: number]: number,
+}
+
+export interface CompetitiveUpdate {
+	MatchID: string, // uuid
+	MapID: GameMap,
+	SeasonID: string, // uuid
+	MatchStartTime: number,
+	TierAfterUpdate: number,
+	TierBeforeUpdate: number,
+	RankedRatingAfterUpdate: number,
+	RankedRatingBeforeUpdate: number,
+	RankedRatingEarned: number,
+	RankedRatingPerformanceBonus: number,
+	CompetitiveMovement: string, // "MOVEMENT_UNKNOWN"
+	AFKPenalty: number,
 }

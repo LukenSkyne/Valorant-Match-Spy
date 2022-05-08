@@ -1,8 +1,8 @@
 import { ValorantClientBase } from "./ValorantClientBase"
-import { GetLocal, GetGlz, PutPd } from "../../wailsjs/go/valorant/Client.js"
+import { GetGlz, GetLocal, GetPd, PutPd } from "../../wailsjs/go/valorant/Client.js"
 import { SaveLog } from "../../wailsjs/go/utils/Utility.js"
 
-import type { Presence, RawPresence, PlayerData, CoreGameMatch, PreGameMatch, PlayerName } from "./Typedef"
+import type { CoreGameMatch, PlayerData, PlayerMMR, PlayerName, PreGameMatch, Presence, RawPresence } from "./Typedef"
 
 export class ValorantClient extends ValorantClientBase {
 
@@ -14,7 +14,7 @@ export class ValorantClient extends ValorantClientBase {
 
 			presences.push({
 				...rawPresence,
-				private: hasPrivate ? JSON.parse(atob(rawPresence.private)) : null
+				private: hasPrivate ? JSON.parse(atob(rawPresence.private)) : null,
 			})
 		}
 
@@ -30,9 +30,13 @@ export class ValorantClient extends ValorantClientBase {
 
 		return this.processPresences(rawPresences)
 	}
-
+	
 	async getNames(playerUUIDs: string[]): Promise<PlayerName[]> {
 		return JSON.parse(await PutPd("/name-service/v2/players", JSON.stringify(playerUUIDs)))
+	}
+
+	async getMMR(playerUUID: string): Promise<PlayerMMR> {
+		return JSON.parse(await GetPd(`/mmr/v1/players/${playerUUID}`))
 	}
 
 	/* PreGame */
