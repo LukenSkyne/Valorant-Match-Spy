@@ -30,6 +30,10 @@
 
 	async function initLoop() {
 		if (await tryInit() === false) {
+			if (initLoopHandle === null) {
+				initLoopHandle = setInterval(initLoop, 5000)
+			}
+
 			return
 		}
 
@@ -43,6 +47,8 @@
 		const presences = await client.getPresences()
 
 		if (presences === null) {
+			console.error("syncWithClient failed")
+
 			return
 		}
 
@@ -62,9 +68,12 @@
 	onMount(() => {
 		//console.debug(new Date().toLocaleTimeString(), "onMount")
 		initLoop()
-		initLoopHandle = setInterval(initLoop, 5000)
 
-		EventsOnMultiple("WS", (data) => {
+		EventsOnMultiple("wsClose", () => {
+			initLoop()
+		}, -1)
+
+		EventsOnMultiple("wsMsg", (data) => {
 			if (data === "") {
 				return
 			}
@@ -89,8 +98,8 @@
 
 				$Presences = $Presences // explicit update
 
-				console.debug("WS chat_v4_presences:", payload.eventType, newPresences)
-				console.debug("$Presences:", $Presences)
+				//console.debug("WS chat_v4_presences:", payload.eventType, newPresences)
+				//console.debug("$Presences:", $Presences)
 
 				const selfPresence = $Presences.find((presence) => presence.puuid === client.selfID)
 
@@ -107,6 +116,20 @@
 			} else if (eventName === "OnJsonApiEvent_entitlements_v1_token") {
 				console.debug("WS entitlements_v1_token:", payload)
 				SaveLog("WS_" + eventName.replace("OnJsonApiEvent_", ""), JSON.stringify(payload, null, "\t"))
+			} else if (eventName === "OnJsonApiEvent_chat_v6_conversations") {
+				if (payload.uri === "/chat/v6/conversations/ares-pregame" && payload.eventType === "Delete" && $ClientState === "PREGAME") {
+					(async () => {
+						console.debug("v6 conversation ares-pregame deleted")
+
+						const playerData = await client.getCoreGamePlayerData(client.selfID)
+						console.debug("playerData:", playerData)
+
+						const coreGameMatchData = await client.getCoreGameMatch(playerData.MatchID)
+						console.debug("coreGameMatchData:", coreGameMatchData)
+					})().catch((err) => {
+						console.error("conversation delete -> error:", err)
+					})
+				}
 			} else {
 				const eventShort = eventName.replace("OnJsonApiEvent_", "")
 
@@ -129,7 +152,8 @@
 	onDestroy(() => {
 		//console.debug(new Date().toLocaleTimeString(), "onDestroy")
 		clearInterval(initLoopHandle)
-		EventsOff("WS")
+		EventsOff("wsMsg")
+		EventsOff("wsClose")
 		unsubscribeClientState()
 	})
 </script>

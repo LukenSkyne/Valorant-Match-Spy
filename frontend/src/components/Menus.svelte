@@ -12,13 +12,13 @@
 	let unsubscribePresences: Unsubscriber
 
 	onMount(() => {
-		unsubscribePresences = Presences.subscribe((value) => {
-			console.log("Menus | Presences updated:", value)
-		})
+		// unsubscribePresences = Presences.subscribe((value) => {
+		// 	console.log("Menus | Presences updated:", value)
+		// })
 	})
 
 	onDestroy(() => {
-		unsubscribePresences()
+		// unsubscribePresences()
 	})
 </script>
 

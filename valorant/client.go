@@ -73,7 +73,7 @@ func (c *Client) Init() bool {
 		SubscribeToEvents: []string{
 			"OnJsonApiEvent_entitlements_v1_token",
 			"OnJsonApiEvent_chat_v4_presences",
-			"OnJsonApiEvent_riot-client-lifecycle-state_v1_state",
+			"OnJsonApiEvent_chat_v6_conversations",
 		},
 	})
 

@@ -33,9 +33,25 @@
 	let clientTeamID: MatchTeam
 	let players: Player[] = []
 
+
+	interface Tier {
+		tier: number,
+		tierName: string, // "UNRANKED"
+		division: string, // "ECompetitiveDivision::UNRANKED"
+		divisionName: string, // "UNRANKED"
+		color: string, // "ffffffff"
+		backgroundColor: string, // "00000000"
+		smallIcon: string,
+		largeIcon: string,
+		rankTriangleDownIcon: string | null,
+		rankTriangleUpIcon: string | null,
+	}
+	let tierList: Tier[] = []
+
+
 	async function fetchMatch(clientState: SessionLoopState | null) {
 		if (clientState === "PREGAME") {
-			console.log("Fetching PreGame")
+			console.log(new Date().toLocaleTimeString(), "Fetching PreGame")
 
 			const playerData = await client.getPreGamePlayerData(client.selfID)
 			preGameMatchData = await client.getPreGameMatch(playerData.MatchID)
@@ -56,7 +72,7 @@
 
 			players = players // explicit update
 		} else if (clientState === "INGAME") {
-			console.log("Fetching CoreGame")
+			console.log(new Date().toLocaleTimeString(), "Fetching CoreGame")
 
 			const playerData = await client.getCoreGamePlayerData(client.selfID)
 			coreGameMatchData = await client.getCoreGameMatch(playerData.MatchID)
@@ -80,10 +96,32 @@
 			}
 
 			players = players // explicit update
+
+			for (const player of players) {
+				const playerMMR = await client.getMMR(player.Subject)
+
+				if (playerMMR === null) {
+					console.error("PLAYER MMR REQUEST FAILED")
+					break
+				}
+
+				const rankNow = playerMMR.LatestCompetitiveUpdate?.TierAfterUpdate
+				const rrNow = playerMMR.LatestCompetitiveUpdate?.RankedRatingAfterUpdate
+				const rrChange = playerMMR.LatestCompetitiveUpdate?.RankedRatingEarned
+
+				const tierName = tierList[rankNow]
+
+				console.debug(`${player.PlayerName.GameName}#${player.PlayerName.TagLine} - ${tierName ?? rankNow} @ ${rrNow}RR (${rrChange}):`, playerMMR)
+			}
 		}
 	}
 
 	onMount(() => {
+		fetch("https://valorant-api.com/v1/competitivetiers/e4e9a692-288f-63ca-7835-16fbf6234fda").then(async (res) => {
+			const json = await res.json()
+			tierList = json?.data?.["tiers"]
+		})
+
 		unsubscribeClientState = ClientState.subscribe((clientState) => {
 			console.log("InGame | clientState:", clientState)
 			fetchMatch(clientState)

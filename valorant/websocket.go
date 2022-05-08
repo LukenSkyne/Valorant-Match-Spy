@@ -98,9 +98,10 @@ func (w *WebSocket) Connect(ci ConnectionInfo) {
 				w.log.Errorf("Invalid WebSocket message: %v", message)
 			}
 
-			runtime.EventsEmit(w.ctx, "WS", message)
+			runtime.EventsEmit(w.ctx, "wsMsg", message)
 		}
 
-		defer conn.Close()
+		conn.Close()
+		runtime.EventsEmit(w.ctx, "wsClose")
 	}()
 }
