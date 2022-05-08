@@ -107,9 +107,11 @@
 			} else if (eventName === "OnJsonApiEvent_entitlements_v1_token") {
 				console.debug("WS entitlements_v1_token:", payload)
 				SaveLog("WS_" + eventName.replace("OnJsonApiEvent_", ""), JSON.stringify(payload, null, "\t"))
-			} else if (eventName === "OnJsonApiEvent_riot-client-lifecycle-state_v1_state") {
-				console.debug("WS riot-client-lifecycle-state_v1_state:", payload)
-				SaveLog("WS_" + eventName.replace("OnJsonApiEvent_", ""), JSON.stringify(payload, null, "\t"))
+			} else {
+				const eventShort = eventName.replace("OnJsonApiEvent_", "")
+
+				console.debug(`WS ${eventShort}:`, payload)
+				SaveLog("WS_" + eventShort, JSON.stringify(payload, null, "\t"))
 			}
 		}, -1)
 

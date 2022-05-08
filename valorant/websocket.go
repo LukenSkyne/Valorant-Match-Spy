@@ -56,7 +56,7 @@ func (w *WebSocket) Connect(ci ConnectionInfo) {
 
 	go func() {
 		for _, eventName := range ci.SubscribeToEvents {
-			msg := fmt.Sprintf("[5, \"%v\"]", eventName)
+			msg := fmt.Sprintf("[5, %q]", eventName)
 			w.log.Debugw("WebSocket subscription", "Event", eventName, "Message", msg)
 
 			if err := conn.WriteMessage(1, []byte(msg)); err != nil {

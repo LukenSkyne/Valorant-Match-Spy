@@ -62,6 +62,8 @@
 			coreGameMatchData = await client.getCoreGameMatch(playerData.MatchID)
 			const playerNames = await client.getNames(coreGameMatchData.Players.map((player) => player.Subject))
 
+			clientTeamID = coreGameMatchData.Players.find((player) => player.Subject === client.selfID)?.TeamID
+
 			while (players.length) {
 				players.pop()
 			}
