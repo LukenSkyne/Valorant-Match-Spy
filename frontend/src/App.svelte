@@ -70,6 +70,7 @@
 		initLoop()
 
 		EventsOnMultiple("wsClose", () => {
+			$ClientState = null
 			initLoop()
 		}, -1)
 

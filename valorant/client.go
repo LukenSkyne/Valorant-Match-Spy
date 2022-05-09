@@ -33,9 +33,10 @@ type Client struct {
 	credentials     *Credentials
 	clientInfo      *ClientInfo
 
-	local *Remote
-	glz   *Remote
-	pd    *Remote
+	local  *Remote
+	shared *Remote
+	glz    *Remote
+	pd     *Remote
 }
 
 func NewClient(log *zap.SugaredLogger) *Client {
@@ -144,6 +145,7 @@ func (c *Client) buildRemotes() {
 		req.Header.Set("User-Agent", "ShooterGame/13 Windows/10.0.22000.1.256.64bit")
 	}
 
+	c.shared = NewRemote(c.log, c.clientInfo.SharedHost, interceptor)
 	c.glz = NewRemote(c.log, c.clientInfo.GlzHost, interceptor)
 	c.pd = NewRemote(c.log, c.clientInfo.PdHost, interceptor)
 }
@@ -252,4 +254,8 @@ func (c *Client) GetPd(url string) *string {
 
 func (c *Client) PutPd(url string, payload string) *string {
 	return c.requestRemotely(c.pd, http.MethodPut, url, &payload)
+}
+
+func (c *Client) GetShared(url string) *string {
+	return c.requestRemotely(c.shared, http.MethodGet, url, nil)
 }

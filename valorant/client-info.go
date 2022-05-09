@@ -9,9 +9,10 @@ import (
 )
 
 type ClientInfo struct {
-	Version string
-	GlzHost string
-	PdHost  string
+	Version    string
+	GlzHost    string
+	PdHost     string
+	SharedHost string
 }
 
 func NewClientInfo() *ClientInfo {
@@ -48,7 +49,9 @@ func (c *ClientInfo) Read() error {
 			c.GlzHost = glzRegex.FindString(line)
 		} else if strings.Index(line, "AccountXP_GetPlayer") != -1 {
 			// line with pd host
-			c.PdHost = pdRegex.FindString(line)
+			pdMatch := pdRegex.FindStringSubmatch(line)
+			c.PdHost = pdMatch[0]
+			c.SharedHost = fmt.Sprintf("https://shared.%v.a.pvp.net", pdMatch[1])
 		}
 
 		if c.Version != "" && c.GlzHost != "" && c.PdHost != "" {

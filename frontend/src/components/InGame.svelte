@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onDestroy, onMount } from "svelte"
+	import { fade } from "svelte/transition"
 	import type { Unsubscriber } from "svelte/store"
 	//
 	import { ValorantClient } from "../script/ValorantClient"
@@ -7,7 +8,7 @@
 		CoreGameMatch,
 		MatchTeam,
 		PlayerIdentity,
-		PlayerName,
+		PlayerNameInfo,
 		PreGameMatch,
 		SeasonalBadgeInfo, SessionLoopState,
 	} from "../script/Typedef"
@@ -15,12 +16,15 @@
 	import { ClientState } from "../stores/Data"
 
 	interface Player {
-		Subject: string, // uuid
-		TeamID: MatchTeam,
-		CharacterID: string | null,
-		PlayerIdentity: PlayerIdentity,
-		SeasonalBadgeInfo: SeasonalBadgeInfo,
-		PlayerName: PlayerName,
+		Subject: string // uuid
+		TeamID: MatchTeam
+		CharacterID: string | null
+		PlayerIdentity: PlayerIdentity
+		SeasonalBadgeInfo: SeasonalBadgeInfo
+		NameInfo: PlayerNameInfo
+		CurrentTier: Tier | null
+		PeakTier: Tier | null
+		CurrentRankedRating: number | null
 	}
 
 	// props
@@ -35,18 +39,19 @@
 
 
 	interface Tier {
-		tier: number,
-		tierName: string, // "UNRANKED"
-		division: string, // "ECompetitiveDivision::UNRANKED"
-		divisionName: string, // "UNRANKED"
-		color: string, // "ffffffff"
-		backgroundColor: string, // "00000000"
-		smallIcon: string,
-		largeIcon: string,
-		rankTriangleDownIcon: string | null,
-		rankTriangleUpIcon: string | null,
+		tier: number
+		tierName: string // "UNRANKED"
+		division: string // "ECompetitiveDivision::UNRANKED"
+		divisionName: string // "UNRANKED"
+		color: string // "ffffffff"
+		backgroundColor: string // "00000000"
+		smallIcon: string
+		largeIcon: string
+		rankTriangleDownIcon: string | null
+		rankTriangleUpIcon: string | null
 	}
 	let tierList: Tier[] = []
+	let currentSeasonID: string = null
 
 
 	async function fetchMatch(clientState: SessionLoopState | null) {
@@ -63,10 +68,13 @@
 				players.push({
 					Subject: teamMember.Subject,
 					TeamID: clientTeamID,
-					PlayerName: playerNames.find((playerName) => playerName.Subject === teamMember.Subject),
+					NameInfo: playerNames.find((playerName) => playerName.Subject === teamMember.Subject),
 					PlayerIdentity: teamMember.PlayerIdentity,
 					SeasonalBadgeInfo: teamMember.SeasonalBadgeInfo,
 					CharacterID: null,
+					CurrentTier: null,
+					PeakTier: null,
+					CurrentRankedRating: null,
 				})
 			}
 
@@ -88,16 +96,20 @@
 				players.push({
 					Subject: corePlayer.Subject,
 					TeamID: corePlayer.TeamID,
-					PlayerName: playerNames.find((playerName) => playerName.Subject === corePlayer.Subject),
+					NameInfo: playerNames.find((playerName) => playerName.Subject === corePlayer.Subject),
 					PlayerIdentity: corePlayer.PlayerIdentity,
 					SeasonalBadgeInfo: corePlayer.SeasonalBadgeInfo,
 					CharacterID: corePlayer.CharacterID,
+					CurrentTier: null,
+					PeakTier: null,
+					CurrentRankedRating: null,
 				})
 			}
 
 			players = players // explicit update
 
 			for (const player of players) {
+				await new Promise(resolve => setTimeout(resolve, 100))
 				const playerMMR = await client.getMMR(player.Subject)
 
 				if (playerMMR === null) {
@@ -105,22 +117,35 @@
 					break
 				}
 
-				const rankNow = playerMMR.LatestCompetitiveUpdate?.TierAfterUpdate
-				const rrNow = playerMMR.LatestCompetitiveUpdate?.RankedRatingAfterUpdate
-				const rrChange = playerMMR.LatestCompetitiveUpdate?.RankedRatingEarned
+				const seasonalInfoMap = playerMMR.QueueSkills?.competitive?.SeasonalInfoBySeasonID
+				let peakCompetitiveTier = 0
 
-				const tierName = tierList[rankNow]
+				for (const { CompetitiveTier } of Object.values(seasonalInfoMap ?? {})) {
+					if (peakCompetitiveTier < CompetitiveTier) {
+						peakCompetitiveTier = CompetitiveTier
+					}
+				}
 
-				console.debug(`${player.PlayerName.GameName}#${player.PlayerName.TagLine} - ${tierName ?? rankNow} @ ${rrNow}RR (${rrChange}):`, playerMMR)
+				const currentSeasonStats = seasonalInfoMap?.[currentSeasonID]
+				const rankNow = currentSeasonStats?.CompetitiveTier ?? 0
+				const rrNow = currentSeasonStats?.RankedRating ?? 0
+
+				player.CurrentTier = tierList[rankNow]
+				player.PeakTier = tierList[peakCompetitiveTier]
+				player.CurrentRankedRating = rrNow
+				players = players // explicit update
 			}
 		}
 	}
 
-	onMount(() => {
-		fetch("https://valorant-api.com/v1/competitivetiers/e4e9a692-288f-63ca-7835-16fbf6234fda").then(async (res) => {
-			const json = await res.json()
-			tierList = json?.data?.["tiers"]
-		})
+	onMount(async () => {
+		const tiersResponse = await fetch("https://valorant-api.com/v1/competitivetiers")
+		const tiersJson = await tiersResponse.json()
+		tierList = tiersJson?.data?.at(-1)?.["tiers"]
+
+		const content = await client.getContent()
+		const currentSeason = content.Seasons.find((season) => season.IsActive && season.Type === "act")
+		currentSeasonID = currentSeason.ID
 
 		unsubscribeClientState = ClientState.subscribe((clientState) => {
 			console.log("InGame | clientState:", clientState)
@@ -135,23 +160,50 @@
 
 <main class="container">
 	<div class="scoreboard">
+		<div class="container-grid-cols header-row">
+			<div></div>
+			<div>
+				Name
+			</div>
+			<div class="centered-col">
+				Level
+			</div>
+			<div class="centered-col">
+				Current Rank
+			</div>
+			<div class="centered-col">
+				Peak Rank
+			</div>
+		</div>
 		{#each players as player}
-			<div class="player" class:teamBlue={player.TeamID === clientTeamID} class:teamRed={player.TeamID !== clientTeamID}>
-				{#if player.CharacterID !== null}
-					<img alt="" src="https://media.valorant-api.com/agents/{player.CharacterID}/displayicon.png"
-						 height="100%">
-				{/if}
-				<span class="playerName">
+			<div class="container-grid-cols" class:team-blue="{player.TeamID === clientTeamID}"
+				 class:team-red="{player.TeamID !== clientTeamID}">
+				<div class="avatar-col">
+					{#if player.CharacterID !== null}
+						<img alt="" src="https://media.valorant-api.com/agents/{player.CharacterID}/displayicon.png" height="100%">
+					{/if}
+				</div>
+				<div>
 					<span>
-						{player.PlayerName.GameName}
+						{player.NameInfo.GameName}
 					</span>
 					<span style="color: #ffffff77">
-						#{player.PlayerName.TagLine}
+						#{player.NameInfo.TagLine}
 					</span>
-				</span>
-				<span class="playerLevel">
-					Level {player.PlayerIdentity.AccountLevel}
-				</span>
+				</div>
+				<div class="centered-col">
+					{player.PlayerIdentity.AccountLevel}
+				</div>
+				<div class="centered-col rank-col">
+					{#if player.CurrentTier !== null}
+						<img in:fade="{{ duration: 200 }}" alt="" src={player.CurrentTier.smallIcon}>
+					{/if}
+				</div>
+				<div class="centered-col rank-col">
+					{#if player.PeakTier !== null && player.PeakTier !== player.CurrentTier}
+						<img in:fade="{{ duration: 200 }}" alt="" src={player.PeakTier.smallIcon}>
+					{/if}
+				</div>
 			</div>
 		{/each}
 	</div>
@@ -162,45 +214,56 @@
 </main>
 
 <style>
+	:root {
+		--size: 64px;
+	}
+
     .scoreboard {
-        width: 700px;
+        /*width: 700px;*/
+        width: 80%;
         background-color: #333333;
 
         padding: 1px;
     }
 
-    .player {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-
-        height: 64px;
-
-        background-color: #222222;
+    .header-row {
+        border: 4px solid #444444;
     }
 
-    .player:not(:first-child) {
-        margin-top: 1px;
-    }
-
-    .playerName {
-        width: 200px;
-        margin-left: 1rem;
-
-        /*white-space: nowrap;*/
-        /*overflow: hidden;*/
-        /*text-overflow: ellipsis;*/
-    }
-
-    .playerLevel {
-        margin-left: 1rem;
-    }
-
-    .teamBlue {
+    .team-blue {
         background-color: #308376aa;
+        border: 4px solid #308376;
     }
 
-    .teamRed {
+    .team-red {
         background-color: #833330aa;
+        border: 4px solid #833330;
     }
+
+	.container-grid-cols {
+		display: grid;
+        column-gap: 1rem;
+		grid-template-columns: var(--size) 2fr 1fr 1fr 1fr;
+		align-items: center;
+	}
+
+    .container-grid-cols:nth-child(n+2) {
+        margin-top: 2px;
+    }
+
+	.centered-col {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+        text-align: center;
+	}
+
+	.rank-col {
+        height: 90%;
+	}
+
+    .avatar-col {
+        width: var(--size);
+        height: var(--size);
+	}
 </style>

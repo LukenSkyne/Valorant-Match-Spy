@@ -1,8 +1,17 @@
 import { ValorantClientBase } from "./ValorantClientBase"
-import { GetGlz, GetLocal, GetPd, PutPd } from "../../wailsjs/go/valorant/Client.js"
+import { GetGlz, GetLocal, GetPd, PutPd, GetShared } from "../../wailsjs/go/valorant/Client.js"
 import { SaveLog } from "../../wailsjs/go/utils/Utility.js"
 
-import type { CoreGameMatch, PlayerData, PlayerMMR, PlayerName, PreGameMatch, Presence, RawPresence } from "./Typedef"
+import type {
+	Content,
+	CoreGameMatch,
+	PlayerData,
+	PlayerMMR,
+	PlayerNameInfo,
+	PreGameMatch,
+	Presence,
+	RawPresence,
+} from "./Typedef"
 
 export class ValorantClient extends ValorantClientBase {
 
@@ -30,13 +39,17 @@ export class ValorantClient extends ValorantClientBase {
 
 		return this.processPresences(rawPresences)
 	}
-	
-	async getNames(playerUUIDs: string[]): Promise<PlayerName[]> {
+
+	async getNames(playerUUIDs: string[]): Promise<PlayerNameInfo[]> {
 		return JSON.parse(await PutPd("/name-service/v2/players", JSON.stringify(playerUUIDs)))
 	}
 
 	async getMMR(playerUUID: string): Promise<PlayerMMR> {
 		return JSON.parse(await GetPd(`/mmr/v1/players/${playerUUID}`))
+	}
+
+	async getContent(): Promise<Content> {
+		return JSON.parse(await GetShared("/content-service/v3/content"))
 	}
 
 	/* PreGame */
