@@ -15,7 +15,7 @@ import type {
 
 export class ValorantClient extends ValorantClientBase {
 
-	processPresences(rawPresences: RawPresence[]): Presence[] {
+	static processPresences(rawPresences: RawPresence[]): Presence[] {
 		const presences: Presence[] = []
 
 		for (const rawPresence of rawPresences as RawPresence[]) {
@@ -37,7 +37,7 @@ export class ValorantClient extends ValorantClientBase {
 			return null
 		}
 
-		return this.processPresences(rawPresences)
+		return ValorantClient.processPresences(rawPresences)
 	}
 
 	async getNames(playerUUIDs: string[]): Promise<PlayerNameInfo[]> {

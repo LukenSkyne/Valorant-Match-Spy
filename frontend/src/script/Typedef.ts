@@ -209,7 +209,7 @@ export interface CoreGameMatch {
 // interfaces for pd
 
 export interface PlayerNameInfo {
-	DisplayName: string | "" // uuid
+	DisplayName: string | ""
 	Subject: string // uuid
 	GameName: string
 	TagLine: string

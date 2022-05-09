@@ -83,7 +83,7 @@
 
 			if (eventName === "OnJsonApiEvent_chat_v4_presences") {
 				const rawPresences: RawPresence[] = payload.data["presences"]
-				const newPresences = client.processPresences(rawPresences)
+				const newPresences = ValorantClient.processPresences(rawPresences)
 
 				for (const newPresence of newPresences) {
 					const i = $Presences.findIndex((p) => p.puuid === newPresence.puuid)

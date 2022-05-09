@@ -6,17 +6,15 @@ html {
 body {
     margin: 0;
     color: white;
-    font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
-    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+    font-family: "DIN Next LT", sans-serif;
 }
 
 @font-face {
-    font-family: "Nunito";
+    font-family: "DIN Next LT";
     font-style: normal;
     font-weight: 400;
     src: local(""),
-    url("assets/fonts/nunito-v16-latin-regular.woff2") format("woff2");
+    url("assets/fonts/din-next-lt-regular.woff2") format("woff2");
 }
 
 #app {
@@ -33,6 +31,10 @@ body {
     justify-content: center;
 
     /*background-color: hsl(220, 50%, 13%);*/
+    /*background-size: cover;*/
+    /*background-position: center;*/
+
+    /*background-image: url("https://cdn.discordapp.com/attachments/617104522019471378/973021254967783444/EZdU_SPXgAEsjre.png");*/
     /*background-size: cover;*/
     /*background-position: center;*/
 }
