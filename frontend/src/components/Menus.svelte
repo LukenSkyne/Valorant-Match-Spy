@@ -18,7 +18,7 @@
 	})
 
 	onDestroy(() => {
-		// unsubscribePresences()
+		unsubscribePresences?.()
 	})
 </script>
 

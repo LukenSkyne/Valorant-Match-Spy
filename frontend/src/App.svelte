@@ -4,6 +4,7 @@
 	//
 	import { EventsOff, EventsOnMultiple, WindowSetTitle } from "../wailsjs/runtime"
 	import { ValorantClient } from "./script/ValorantClient"
+	//import { ValorantClientMock } from "./script/ValorantClientMock"
 	import { SaveLog } from "../wailsjs/go/utils/Utility"
 	//
 	import type { RawPresence, WebSocketPayload } from "./script/Typedef"
@@ -122,11 +123,13 @@
 					(async () => {
 						console.debug("v6 conversation ares-pregame deleted")
 
-						const playerData = await client.getCoreGamePlayerData(client.selfID)
-						console.debug("playerData:", playerData)
+						// const playerData = await client.getCoreGamePlayerData(client.selfID)
+						// console.debug("playerData:", playerData)
+						//
+						// const coreGameMatchData = await client.getCoreGameMatch(playerData.MatchID)
+						// console.debug("coreGameMatchData:", coreGameMatchData)
 
-						const coreGameMatchData = await client.getCoreGameMatch(playerData.MatchID)
-						console.debug("coreGameMatchData:", coreGameMatchData)
+						$ClientState = "INGAME"
 					})().catch((err) => {
 						console.error("conversation delete -> error:", err)
 					})

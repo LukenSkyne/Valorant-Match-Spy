@@ -2,7 +2,7 @@
 	"MatchID": "1d5fa9b3-0dca-4be4-a2ff-0158d2111d6b",
 	"Version": 1652034554654,
 	"State": "IN_PROGRESS",
-	"MapID": "/Game/Maps/Ascent/Ascent",
+	"MapID": "/Game/Maps/Port/Port",
 	"ModeID": "/Game/GameModes/Bomb/BombGameMode.BombGameMode_C",
 	"ProvisioningFlow": "Matchmaking",
 	"GamePodID": "aresriot.aws-rclusterprod-euw3-1.eu-gp-paris-1",
@@ -32,7 +32,7 @@
 			"CharacterID": "f94c3b30-42be-e959-889c-5aa313dba261",
 			"PlayerIdentity": {
 				"Subject": "3c74b9e9-a423-51b3-a942-1bdc37d78b61",
-				"PlayerCardID": "fbe4935e-421d-4d5d-9ea8-3fb5218d1d1d",
+				"PlayerCardID": "3432dc3d-47da-4675-67ae-53adb1fdad5e",
 				"PlayerTitleID": "189f8454-45f8-0a74-4b25-77aae468ac02",
 				"AccountLevel": 55,
 				"PreferredLevelBorderID": "00000000-0000-0000-0000-000000000000",

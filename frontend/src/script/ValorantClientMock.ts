@@ -67,7 +67,7 @@ export class ValorantClientMock {
 				queueEntryTime: "2022.05.03-23.08.47", // "2022.05.03-23.08.47"
 				queueId: "competitive",
 				rosterId: "string",
-				sessionLoopState: "INGAME",
+				sessionLoopState: "PREGAME",
 				tournamentId: "string",
 			},
 			privateJwt: null,
@@ -86,7 +86,7 @@ export class ValorantClientMock {
 			DisplayName: "",
 			Subject: playerUUIDs[index],
 			GameName: `Player${index+1}`,
-			TagLine: "EUW",
+			TagLine: `EUW${index+1}`,
 		}))
 	}
 
@@ -96,8 +96,8 @@ export class ValorantClientMock {
 		const previousSeason = imp.QueueSkills.competitive.SeasonalInfoBySeasonID["2a27e5d2-4d30-c9e2-b15a-93b8909a442c"]
 		const currentSeason = imp.QueueSkills.competitive.SeasonalInfoBySeasonID["3e47230a-463c-a301-eb7d-67bb60357d4f"]
 
-		previousSeason.CompetitiveTier = Math.round((Math.random() * 22) + 3)
-		currentSeason.CompetitiveTier = Math.round((Math.random() * 22) + 3)
+		previousSeason.CompetitiveTier = Math.round((Math.random() * 21) + 3)
+		currentSeason.CompetitiveTier = Math.round((Math.random() * 21) + 3)
 		currentSeason.RankedRating = Math.round((Math.random() * 100))
 
 		return imp as unknown as PlayerMMR
