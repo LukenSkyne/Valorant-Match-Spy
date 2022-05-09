@@ -111,7 +111,7 @@
 
 				const newClientState = selfPresence.private.sessionLoopState
 
-				if ($ClientState !== newClientState) {
+				if ($ClientState !== newClientState && (newClientState !== "PREGAME" || $ClientState !== "INGAME")) {
 					$ClientState = newClientState
 					console.debug("$ClientState update through WS", $ClientState)
 				}
@@ -120,19 +120,8 @@
 				SaveLog("WS_" + eventName.replace("OnJsonApiEvent_", ""), JSON.stringify(payload, null, "\t"))
 			} else if (eventName === "OnJsonApiEvent_chat_v6_conversations") {
 				if (payload.uri === "/chat/v6/conversations/ares-pregame" && payload.eventType === "Delete" && $ClientState === "PREGAME") {
-					(async () => {
-						console.debug("v6 conversation ares-pregame deleted")
-
-						// const playerData = await client.getCoreGamePlayerData(client.selfID)
-						// console.debug("playerData:", playerData)
-						//
-						// const coreGameMatchData = await client.getCoreGameMatch(playerData.MatchID)
-						// console.debug("coreGameMatchData:", coreGameMatchData)
-
-						$ClientState = "INGAME"
-					})().catch((err) => {
-						console.error("conversation delete -> error:", err)
-					})
+					$ClientState = "INGAME"
+					console.debug("WS pregame ended -> INGAME")
 				}
 			} else {
 				const eventShort = eventName.replace("OnJsonApiEvent_", "")
