@@ -2,8 +2,8 @@
 	import { onDestroy, onMount } from "svelte"
 	import type { Unsubscriber } from "svelte/store"
 	//
-	//import { ValorantClient } from "../script/ValorantClient"
-	import { ValorantClient } from "../script/ValorantClientMock"
+	import { ValorantClient } from "../script/ValorantClient"
+	//import { ValorantClient } from "../script/ValorantClientMock"
 	import type { CoreGameMatch, MatchTeam, PreGameMatch, SessionLoopState } from "../script/Typedef"
 	import type { CompetitiveTier, Player } from "./Typedef"
 	import PlayerInfo from "./PlayerInfo.svelte"
@@ -16,13 +16,13 @@
 	let coreGameMatchData: CoreGameMatch
 	let clientTeamID: MatchTeam
 	let players: Player[] = []
-
-	$: allies = players.filter((p) => p.TeamID === clientTeamID)
-	$: enemies = players.filter((p) => p.TeamID !== clientTeamID)
-
 	let tierList: CompetitiveTier[] = []
 	let currentSeasonID: string = null
 	let backgroundUrl: string = null
+
+	$: allies = players.filter((p) => p.TeamID === clientTeamID)
+	$: enemies = players.filter((p) => p.TeamID !== clientTeamID)
+	$: gameContainerStyle = `--background-url: url(${backgroundUrl})`
 
 	async function updateBackground(mapID) {
 		if (backgroundUrl !== null) {
@@ -161,7 +161,7 @@
 	})
 </script>
 
-<main class="gameContainer" style="--background-url: url({backgroundUrl})">
+<main class="gameContainer" style={gameContainerStyle}>
 	<!-- ALLIES -->
 	{#if allies.length > 0}
 		<div class="teamContainer">

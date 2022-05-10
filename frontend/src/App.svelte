@@ -3,8 +3,8 @@
 	import type { Unsubscriber } from "svelte/store"
 	//
 	import { EventsOff, EventsOnMultiple, WindowSetTitle } from "../wailsjs/runtime"
-	//import { ValorantClient } from "./script/ValorantClient"
-	import { ValorantClient } from "./script/ValorantClientMock"
+	import { ValorantClient } from "./script/ValorantClient"
+	//import { ValorantClient } from "./script/ValorantClientMock"
 	import { SaveLog } from "../wailsjs/go/utils/Utility"
 	//
 	import type { RawPresence, WebSocketPayload } from "./script/Typedef"

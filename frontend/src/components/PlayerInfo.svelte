@@ -134,7 +134,7 @@
     }
 
     .playerName {
-
+		/* placeholder */
     }
 
     .playerTag {
