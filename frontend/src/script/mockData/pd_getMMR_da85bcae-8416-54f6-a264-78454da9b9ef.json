@@ -1,5 +1,5 @@
 {
-	"Version": 1651943337983,
+	"Version": 1652130014024,
 	"Subject": "da85bcae-8416-54f6-a264-78454da9b9ef",
 	"NewPlayerExperienceFinished": true,
 	"QueueSkills": {
@@ -13,10 +13,10 @@
 					"NumberOfWins": 58,
 					"NumberOfWinsWithPlacements": 60,
 					"NumberOfGames": 118,
-					"Rank": 0,
+					"Rank": 20,
 					"CapstoneWins": 0,
 					"LeaderboardRank": 0,
-					"CompetitiveTier": 0,
+					"CompetitiveTier": 19,
 					"RankedRating": 0,
 					"WinsByTier": {
 						"0": 2,
@@ -35,10 +35,10 @@
 					"NumberOfWins": 13,
 					"NumberOfWinsWithPlacements": 16,
 					"NumberOfGames": 35,
-					"Rank": 0,
+					"Rank": 17,
 					"CapstoneWins": 0,
 					"LeaderboardRank": 0,
-					"CompetitiveTier": 0,
+					"CompetitiveTier": 17,
 					"RankedRating": 45,
 					"WinsByTier": {
 						"0": 3,
@@ -50,16 +50,16 @@
 				},
 				"3e47230a-463c-a301-eb7d-67bb60357d4f": {
 					"SeasonID": "3e47230a-463c-a301-eb7d-67bb60357d4f",
-					"NumberOfWins": 9,
-					"NumberOfWinsWithPlacements": 9,
-					"NumberOfGames": 25,
-					"Rank": 0,
+					"NumberOfWins": 11,
+					"NumberOfWinsWithPlacements": 11,
+					"NumberOfGames": 30,
+					"Rank": 3,
 					"CapstoneWins": 0,
 					"LeaderboardRank": 0,
-					"CompetitiveTier": 0,
-					"RankedRating": 58,
+					"CompetitiveTier": 3,
+					"RankedRating": 60,
 					"WinsByTier": {
-						"3": 9
+						"3": 11
 					},
 					"GamesNeededForRating": 0,
 					"TotalWinsNeededForRank": 0
@@ -69,10 +69,10 @@
 					"NumberOfWins": 31,
 					"NumberOfWinsWithPlacements": 32,
 					"NumberOfGames": 61,
-					"Rank": 0,
+					"Rank": 17,
 					"CapstoneWins": 0,
 					"LeaderboardRank": 0,
-					"CompetitiveTier": 0,
+					"CompetitiveTier": 17,
 					"RankedRating": 0,
 					"WinsByTier": {
 						"0": 1,
@@ -90,10 +90,10 @@
 					"NumberOfWins": 75,
 					"NumberOfWinsWithPlacements": 76,
 					"NumberOfGames": 147,
-					"Rank": 0,
+					"Rank": 20,
 					"CapstoneWins": 0,
 					"LeaderboardRank": 0,
-					"CompetitiveTier": 0,
+					"CompetitiveTier": 20,
 					"RankedRating": 2046,
 					"WinsByTier": {
 						"0": 1,
@@ -113,10 +113,10 @@
 					"NumberOfWins": 12,
 					"NumberOfWinsWithPlacements": 12,
 					"NumberOfGames": 28,
-					"Rank": 0,
+					"Rank": 20,
 					"CapstoneWins": 0,
 					"LeaderboardRank": 0,
-					"CompetitiveTier": 0,
+					"CompetitiveTier": 19,
 					"RankedRating": 27,
 					"WinsByTier": {
 						"19": 6,
@@ -150,10 +150,10 @@
 					"NumberOfWins": 28,
 					"NumberOfWinsWithPlacements": 30,
 					"NumberOfGames": 66,
-					"Rank": 0,
+					"Rank": 20,
 					"CapstoneWins": 0,
 					"LeaderboardRank": 0,
-					"CompetitiveTier": 0,
+					"CompetitiveTier": 19,
 					"RankedRating": 36,
 					"WinsByTier": {
 						"0": 2,
@@ -172,7 +172,7 @@
 					"Rank": 0,
 					"CapstoneWins": 0,
 					"LeaderboardRank": 0,
-					"CompetitiveTier": 0,
+					"CompetitiveTier": 18,
 					"RankedRating": 3,
 					"WinsByTier": {
 						"17": 6,
@@ -186,10 +186,10 @@
 					"NumberOfWins": 38,
 					"NumberOfWinsWithPlacements": 38,
 					"NumberOfGames": 125,
-					"Rank": 0,
+					"Rank": 5,
 					"CapstoneWins": 0,
 					"LeaderboardRank": 0,
-					"CompetitiveTier": 0,
+					"CompetitiveTier": 3,
 					"RankedRating": 56,
 					"WinsByTier": {
 						"3": 34,
@@ -239,15 +239,29 @@
 			}
 		},
 		"deathmatch": {
-			"TotalGamesNeededForRating": 5,
-			"TotalGamesNeededForLeaderboard": 36,
-			"CurrentSeasonGamesNeededForRating": 1,
+			"TotalGamesNeededForRating": 4,
+			"TotalGamesNeededForLeaderboard": 35,
+			"CurrentSeasonGamesNeededForRating": 0,
 			"SeasonalInfoBySeasonID": {
 				"0530b9c4-4980-f2ee-df5d-09864cd00542": {
 					"SeasonID": "0530b9c4-4980-f2ee-df5d-09864cd00542",
 					"NumberOfWins": 0,
 					"NumberOfWinsWithPlacements": 0,
 					"NumberOfGames": 5,
+					"Rank": 0,
+					"CapstoneWins": 0,
+					"LeaderboardRank": 0,
+					"CompetitiveTier": 0,
+					"RankedRating": 0,
+					"WinsByTier": null,
+					"GamesNeededForRating": 0,
+					"TotalWinsNeededForRank": 0
+				},
+				"3e47230a-463c-a301-eb7d-67bb60357d4f": {
+					"SeasonID": "3e47230a-463c-a301-eb7d-67bb60357d4f",
+					"NumberOfWins": 0,
+					"NumberOfWinsWithPlacements": 0,
+					"NumberOfGames": 1,
 					"Rank": 0,
 					"CapstoneWins": 0,
 					"LeaderboardRank": 0,
@@ -402,15 +416,15 @@
 				"3e47230a-463c-a301-eb7d-67bb60357d4f": {
 					"SeasonID": "3e47230a-463c-a301-eb7d-67bb60357d4f",
 					"NumberOfWins": 0,
-					"NumberOfWinsWithPlacements": 1,
-					"NumberOfGames": 2,
+					"NumberOfWinsWithPlacements": 2,
+					"NumberOfGames": 4,
 					"Rank": 0,
 					"CapstoneWins": 0,
 					"LeaderboardRank": 0,
 					"CompetitiveTier": 0,
 					"RankedRating": 0,
 					"WinsByTier": {
-						"0": 1
+						"0": 2
 					},
 					"GamesNeededForRating": 0,
 					"TotalWinsNeededForRank": 9
@@ -696,16 +710,16 @@
 		}
 	},
 	"LatestCompetitiveUpdate": {
-		"MatchID": "0d15008a-a898-4706-8a2f-6ab241d77fd1",
-		"MapID": "/Game/Maps/Bonsai/Bonsai",
+		"MatchID": "bc8cf602-e92c-4201-b52f-d139014378f4",
+		"MapID": "/Game/Maps/Foxtrot/Foxtrot",
 		"SeasonID": "3e47230a-463c-a301-eb7d-67bb60357d4f",
-		"MatchStartTime": 1651941540024,
+		"MatchStartTime": 1652127615914,
 		"TierAfterUpdate": 3,
 		"TierBeforeUpdate": 3,
-		"RankedRatingAfterUpdate": 58,
-		"RankedRatingBeforeUpdate": 79,
-		"RankedRatingEarned": -21,
-		"RankedRatingPerformanceBonus": 0,
+		"RankedRatingAfterUpdate": 60,
+		"RankedRatingBeforeUpdate": 34,
+		"RankedRatingEarned": 26,
+		"RankedRatingPerformanceBonus": 6,
 		"CompetitiveMovement": "MOVEMENT_UNKNOWN",
 		"AFKPenalty": 0
 	},

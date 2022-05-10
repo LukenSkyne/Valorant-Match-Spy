@@ -1,4 +1,4 @@
-import { ValorantClient } from "./ValorantClient"
+import { ValorantClient as ValorantClientReal } from "./ValorantClient"
 import type {
 	Content,
 	CoreGameMatch,
@@ -10,20 +10,12 @@ import type {
 	RawPresence,
 } from "./Typedef"
 
-export class ValorantClientMock {
-	selfID: string = null
-
+export class ValorantClient {
 	static processPresences(rawPresences: RawPresence[]): Presence[] {
-		return ValorantClient.processPresences(rawPresences)
+		return ValorantClientReal.processPresences(rawPresences)
 	}
 
-	async init(): Promise<boolean> {
-		this.selfID = "da85bcae-8416-54f6-a264-78454da9b9ef"
-
-		return new Promise((res) => res(true))
-	}
-
-	async getPresences(): Promise<Presence[]> {
+	static async getPresences(): Promise<Presence[]> {
 		return [{
 			actor: "",
 			basic: "",
@@ -67,7 +59,7 @@ export class ValorantClientMock {
 				queueEntryTime: "2022.05.03-23.08.47", // "2022.05.03-23.08.47"
 				queueId: "competitive",
 				rosterId: "string",
-				sessionLoopState: "PREGAME",
+				sessionLoopState: "INGAME",
 				tournamentId: "string",
 			},
 			privateJwt: null,
@@ -81,7 +73,7 @@ export class ValorantClientMock {
 		}]
 	}
 
-	async getNames(playerUUIDs: string[]): Promise<PlayerNameInfo[]> {
+	static async getNames(playerUUIDs: string[]): Promise<PlayerNameInfo[]> {
 		return Array.from(Array(10).keys()).map((index) => ({
 			DisplayName: "",
 			Subject: playerUUIDs[index],
@@ -90,20 +82,13 @@ export class ValorantClientMock {
 		}))
 	}
 
-	async getMMR(playerUUID: string): Promise<PlayerMMR> {
-		const imp = (await import("./mockData/pd_getMMR.json")).default
-
-		const previousSeason = imp.QueueSkills.competitive.SeasonalInfoBySeasonID["2a27e5d2-4d30-c9e2-b15a-93b8909a442c"]
-		const currentSeason = imp.QueueSkills.competitive.SeasonalInfoBySeasonID["3e47230a-463c-a301-eb7d-67bb60357d4f"]
-
-		previousSeason.CompetitiveTier = Math.round((Math.random() * 21) + 3)
-		currentSeason.CompetitiveTier = Math.round((Math.random() * 21) + 3)
-		currentSeason.RankedRating = Math.round((Math.random() * 100))
+	static async getMMR(playerUUID: string): Promise<PlayerMMR> {
+		const imp = (await import(`./mockData/pd_getMMR_${playerUUID}.json`)).default
 
 		return imp as unknown as PlayerMMR
 	}
 
-	async getContent(): Promise<Content> {
+	static async getContent(): Promise<Content> {
 		return {
 			DisabledIDs: [],
 			Events: [],
@@ -120,7 +105,7 @@ export class ValorantClientMock {
 
 	/* PreGame */
 
-	async getPreGamePlayerData(playerUUID: string): Promise<PlayerData> {
+	static async getPreGamePlayerData(playerUUID: string): Promise<PlayerData> {
 		return {
 			Subject: playerUUID,
 			MatchID: "1d5fa9b3-0dca-4be4-a2ff-0158d2111d6b",
@@ -128,20 +113,20 @@ export class ValorantClientMock {
 		}
 	}
 
-	async getPreGameMatch(matchUUID: string): Promise<PreGameMatch> {
+	static async getPreGameMatch(matchUUID: string): Promise<PreGameMatch> {
 		const imp = await import("./mockData/glz_getPreGameMatch.json")
 
 		return imp.default as unknown as PreGameMatch
 	}
 
-	async getPreGameLoadouts(matchUUID: string) {
+	static async getPreGameLoadouts(matchUUID: string) {
 		//const loadoutData = JSON.parse(await GetGlz(`/pregame/v1/matches/${matchUUID}/loadouts`))
 		//return loadoutData
 	}
 
 	/* CoreGame */
 
-	async getCoreGamePlayerData(playerUUID: string): Promise<PlayerData> {
+	static async getCoreGamePlayerData(playerUUID: string): Promise<PlayerData> {
 		return {
 			Subject: playerUUID,
 			MatchID: "1d5fa9b3-0dca-4be4-a2ff-0158d2111d6b",
@@ -149,13 +134,13 @@ export class ValorantClientMock {
 		}
 	}
 
-	async getCoreGameMatch(matchUUID: string): Promise<CoreGameMatch> {
+	static async getCoreGameMatch(matchUUID: string): Promise<CoreGameMatch> {
 		const imp = await import("./mockData/glz_getCoreGameMatch.json")
 
 		return imp.default as CoreGameMatch
 	}
 
-	async getCoreGameLoadouts(matchUUID: string) {
+	static async getCoreGameLoadouts(matchUUID: string) {
 		//const loadoutData = JSON.parse(await GetGlz(`/core-game/v1/matches/${matchUUID}/loadouts`))
 		//return loadoutData
 	}
