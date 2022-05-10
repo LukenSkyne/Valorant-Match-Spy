@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"go.uber.org/zap"
 	"io"
 	"net/http"
@@ -24,9 +25,10 @@ type Credentials struct {
 }
 
 type Client struct {
-	ctx   *context.Context
-	log   *zap.SugaredLogger
-	ready bool
+	ctx      *context.Context
+	log      *zap.SugaredLogger
+	ready    bool
+	initChan chan bool
 
 	integrationInfo *IntegrationInfo
 	integration     *WebSocket
@@ -42,6 +44,7 @@ type Client struct {
 func NewClient(log *zap.SugaredLogger) *Client {
 	return &Client{
 		log:             log,
+		initChan:        make(chan bool),
 		integrationInfo: NewIntegrationInfo(),
 		credentials:     &Credentials{},
 		clientInfo:      NewClientInfo(),
@@ -52,9 +55,46 @@ func (c *Client) OnStartup(ctx context.Context) {
 	c.ctx = &ctx
 }
 
-func (c *Client) Init() bool {
+func (c *Client) Run() {
+	go func() {
+		c.initChan <- true
+	}()
+
+	for {
+		select {
+		case v, ok := <-c.initChan:
+			if !ok {
+				c.log.Info("Init Channel closed")
+				return
+			}
+
+			if v {
+				c.log.Debug("Init requested")
+			}
+
+			if c.ctx != nil {
+				runtime.EventsEmit(*c.ctx, "state", false)
+			}
+
+			if c.init() == false {
+				go func() {
+					time.Sleep(time.Second * 3)
+					c.initChan <- false
+				}()
+			}
+		}
+	}
+}
+
+func (c *Client) Stop() {
+	close(c.initChan)
+}
+
+func (c *Client) init() bool {
+	c.ready = false
+
 	if err := c.integrationInfo.Read(); err != nil {
-		c.log.Info("Reading IntegrationInfo failed")
+		//c.log.Info("Reading IntegrationInfo failed")
 		return false
 	}
 
@@ -62,10 +102,20 @@ func (c *Client) Init() bool {
 		"Port", c.integrationInfo.Port,
 		"Password", c.integrationInfo.Password)
 
+	if err := c.clientInfo.Read(); err != nil {
+		c.log.Errorf("Reading ClientInfo failed: %v", err.Error())
+		return false
+	}
+
+	c.log.Infow("Client Info",
+		"Version", c.clientInfo.Version,
+		"GlzHost", c.clientInfo.GlzHost,
+		"PdHost", c.clientInfo.PdHost)
+
 	localHost := fmt.Sprintf("%v://127.0.0.1:%v", c.integrationInfo.Protocol, c.integrationInfo.Port)
 	localAuth := "Basic " + base64.StdEncoding.EncodeToString([]byte("riot:"+c.integrationInfo.Password))
 
-	c.integration = NewWebSocket(c.log, *c.ctx)
+	c.integration = NewWebSocket(c.log, c.ctx, c.initChan)
 	c.integration.Connect(ConnectionInfo{
 		Protocol: "wss",
 		Host:     "localhost",
@@ -82,16 +132,6 @@ func (c *Client) Init() bool {
 		req.Header.Set("Authorization", localAuth)
 	})
 
-	if err := c.clientInfo.Read(); err != nil {
-		c.log.Errorf("Reading ClientInfo failed: %v", err.Error())
-		return false
-	}
-
-	c.log.Infow("Client Info",
-		"Version", c.clientInfo.Version,
-		"GlzHost", c.clientInfo.GlzHost,
-		"PdHost", c.clientInfo.PdHost)
-
 	if err := c.fetchCredentials(); err != nil {
 		c.log.Errorf("Fetching Credentials failed: %v", err.Error())
 		return false
@@ -103,6 +143,11 @@ func (c *Client) Init() bool {
 		"ExpiresAt", c.credentials.ExpiresAt)
 
 	c.ready = true
+
+	if c.ctx != nil {
+		runtime.EventsEmit(*c.ctx, "state", true)
+	}
+
 	return true
 }
 

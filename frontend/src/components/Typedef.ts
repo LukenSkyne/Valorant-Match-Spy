@@ -14,12 +14,12 @@ export interface Player {
 }
 
 export interface CompetitiveTier {
-	tier: number
-	tierName: string // "UNRANKED"
-	division: string // "ECompetitiveDivision::UNRANKED"
-	divisionName: string // "UNRANKED"
-	color: string // "ffffffff"
-	backgroundColor: string // "00000000"
+	tier: number // 20
+	tierName: string // "DIAMOND 3"
+	division: string // "ECompetitiveDivision::DIAMOND""
+	divisionName: string // "DIAMOND"
+	color: string // "b489c4ff"
+	backgroundColor: string // "763bafff"
 	smallIcon: string
 	largeIcon: string
 	rankTriangleDownIcon: string | null

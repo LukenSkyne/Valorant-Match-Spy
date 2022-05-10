@@ -24,6 +24,8 @@ func main() {
 	client := valorant.NewClient(log)
 	utility := utils.NewUtility(log)
 
+	go client.Run()
+
 	log.Info("Starting app")
 
 	// Create application with options
@@ -38,6 +40,8 @@ func main() {
 			utility,
 		},
 	})
+
+	client.Stop()
 
 	if err != nil {
 		log.Fatalf("Error running app: %v", err.Error())

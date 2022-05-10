@@ -9,30 +9,37 @@
 	$: playerCardImage = `https://media.valorant-api.com/playercards/${player.PlayerIdentity.PlayerCardID}/wideart.png`
 </script>
 
-<div class="playerContainer">
+<div>
 	<div class="playerTop">
 		{#if player.CharacterID !== null}
 			<img alt src={agentImage} class="agent" data-team={team}>
 		{:else}
 			<div class="agent" data-team={team}>
-				<img alt src="https://media.valorant-api.com/agents/dade69b4-4f5a-8528-247b-219e5a1facd6/displayicon.png" style="filter: opacity(15%)" height="100%">
+				<img alt
+					 src="https://media.valorant-api.com/agents/dade69b4-4f5a-8528-247b-219e5a1facd6/displayicon.png"
+					 style="filter: opacity(15%)" height="100%">
 			</div>
 		{/if}
 		<div class="card">
 			<img alt src={playerCardImage} height="100%">
-			{#if player.HighestTier !== null && player.CurrentTier !== null && player.LowestTier}
+			{#if player.HighestTier !== null || player.CurrentTier !== null}
 				<div class="floatingRankInfo" in:fade={{duration: 200 }}>
-					<div class="rankInfo">
-						<span class="rankPill">Highest</span>
-						<!--{#if player.HighestTier === undefined}-->
-						<!--	{@debug player}-->
-						<!--{/if}-->
-						<img alt src={player.HighestTier.largeIcon} height="100%">
-					</div>
-					<div class="rankInfo">
-						<span class="rankPill">Current</span>
-						<img alt src={player.CurrentTier.largeIcon} height="100%">
-					</div>
+					{#if player.HighestTier !== null}
+						<div class="rankInfo">
+							<span class="rankText">
+								Highest
+							</span>
+							<img alt src={player.HighestTier.smallIcon} height="100%">
+						</div>
+					{/if}
+					{#if player.CurrentTier !== null}
+						<div class="rankInfo">
+							<span class="rankText">
+								Current
+							</span>
+							<img alt src={player.CurrentTier.smallIcon} height="100%">
+						</div>
+					{/if}
 				</div>
 			{/if}
 		</div>
@@ -45,24 +52,20 @@
 </div>
 
 <style>
-    .playerContainer {
-
-    }
-
     .playerTop {
         height: 92px;
         display: flex;
         gap: 3px;
     }
 
-	.agent {
+    .agent {
         height: 92px;
         aspect-ratio: 1;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		color: #fff6
-	}
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #fff6
+    }
 
     .agent[data-team="blue"] {
         background-color: hsl(var(--blue-darker) / 50%);
@@ -83,49 +86,43 @@
     .floatingRankInfo {
         position: absolute;
         right: 0;
-		height: 64px;
-		padding: 4px;
+        padding: 4px;
 
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		gap: 4px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 4px;
 
-		background-color: #222a;
-		border-radius: 10px 0 0 10px;
+        background-color: #2227;
+        border-radius: 4px 0 0 4px;
+        backdrop-filter: blur(2px);
     }
 
-	.rankInfo {
+    .rankInfo {
         position: relative;
-        height: 30px;
+        height: 32px;
 
         display: flex;
         flex-direction: row;
 
-		align-items: center;
-		justify-content: flex-end;
-		gap: 4px;
-	}
+        align-items: center;
+        justify-content: flex-end;
+        gap: 4px;
+    }
 
-	.rankPill {
-        /*background-color: #0007;*/
-		border-radius: 100px;
-		padding: 2px 6px;
-
-		font-size: 12px;
-	}
+    .rankText {
+        padding: 2px 6px;
+        font-size: 13px;
+    }
 
     .playerBottom {
-        margin-top: 3px;
-
-        height: 19px;
-
         display: flex;
         align-items: center;
 
+        height: 19px;
+        margin-top: 3px;
         padding: 0 4px;
-
-        font-size: 12px;
+        font-size: 13px;
     }
 
     .playerBottom[data-team="blue"] {

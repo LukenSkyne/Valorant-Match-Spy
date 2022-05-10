@@ -20,14 +20,16 @@ type ConnectionInfo struct {
 }
 
 type WebSocket struct {
-	log *zap.SugaredLogger
-	ctx context.Context
+	log  *zap.SugaredLogger
+	ctx  *context.Context
+	init chan bool
 }
 
-func NewWebSocket(log *zap.SugaredLogger, ctx context.Context) *WebSocket {
+func NewWebSocket(log *zap.SugaredLogger, ctx *context.Context, init chan bool) *WebSocket {
 	return &WebSocket{
-		log: log,
-		ctx: ctx,
+		log:  log,
+		ctx:  ctx,
+		init: init,
 	}
 }
 
@@ -98,10 +100,12 @@ func (w *WebSocket) Connect(ci ConnectionInfo) {
 				w.log.Errorf("Invalid WebSocket message: %v", message)
 			}
 
-			runtime.EventsEmit(w.ctx, "wsMsg", message)
+			if w.ctx != nil {
+				runtime.EventsEmit(*w.ctx, "msg", message)
+			}
 		}
 
 		conn.Close()
-		runtime.EventsEmit(w.ctx, "wsClose")
+		w.init <- true
 	}()
 }

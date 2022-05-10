@@ -2,23 +2,23 @@
 	import { onDestroy, onMount } from "svelte"
 	import type { Unsubscriber } from "svelte/store"
 	//
-	import { ValorantClient } from "../script/ValorantClient"
+	//import { ValorantClient } from "../script/ValorantClient"
+	import { ValorantClient } from "../script/ValorantClientMock"
 	import type { CoreGameMatch, MatchTeam, PreGameMatch, SessionLoopState } from "../script/Typedef"
 	import type { CompetitiveTier, Player } from "./Typedef"
 	import PlayerInfo from "./PlayerInfo.svelte"
 	//
-	import { ClientState } from "../stores/Data"
-
-	// props
-	export let client: ValorantClient
+	import { ClientID, ClientState } from "../stores/ClientData"
 
 	// members
 	let unsubscribeClientState: Unsubscriber
 	let preGameMatchData: PreGameMatch
 	let coreGameMatchData: CoreGameMatch
 	let clientTeamID: MatchTeam
-	let allies: Player[] = []
-	let enemies: Player[] = []
+	let players: Player[] = []
+
+	$: allies = players.filter((p) => p.TeamID === clientTeamID)
+	$: enemies = players.filter((p) => p.TeamID !== clientTeamID)
 
 	let tierList: CompetitiveTier[] = []
 	let currentSeasonID: string = null
@@ -36,19 +36,58 @@
 		backgroundUrl = currentMap["splash"] ?? null
 	}
 
+	async function fetchRanks() {
+		for (const player of players) {
+			await new Promise(resolve => setTimeout(resolve, 100))
+			const playerMMR = await ValorantClient.getMMR(player.Subject)
+
+			if (playerMMR === null) {
+				console.error("PLAYER MMR REQUEST FAILED")
+				break
+			}
+
+			const seasonalInfoMap = playerMMR.QueueSkills?.competitive?.SeasonalInfoBySeasonID
+			let rankHighest = 0
+			let rankLowest = -1
+
+			for (const {CompetitiveTier} of Object.values(seasonalInfoMap ?? {})) {
+				if (rankHighest < CompetitiveTier) {
+					rankHighest = CompetitiveTier
+				}
+
+				if ((rankLowest > CompetitiveTier || rankLowest === -1) && CompetitiveTier > 2) {
+					rankLowest = CompetitiveTier
+				}
+			}
+
+			const currentSeasonStats = seasonalInfoMap?.[currentSeasonID]
+			const rankNow = currentSeasonStats?.CompetitiveTier ?? 0
+			const rrNow = currentSeasonStats?.RankedRating ?? 0
+
+			player.HighestTier = tierList[rankHighest]
+			player.CurrentTier = tierList[rankNow]
+			player.LowestTier = tierList[rankLowest]
+			player.CurrentRankedRating = rrNow
+
+			console.debug("Player", player.NameInfo.GameName, player.HighestTier, player.CurrentTier, player.LowestTier)
+
+			players = players // explicit update
+		}
+	}
+
 	async function fetchMatch(clientState: SessionLoopState | null) {
 		if (clientState === "PREGAME") {
 			console.log(new Date().toLocaleTimeString(), "Fetching PreGame")
 
-			const playerData = await client.getPreGamePlayerData(client.selfID)
-			preGameMatchData = await client.getPreGameMatch(playerData.MatchID)
-			const playerNames = await client.getNames(preGameMatchData.AllyTeam.Players.map((player) => player.Subject))
+			const playerData = await ValorantClient.getPreGamePlayerData($ClientID)
+			preGameMatchData = await ValorantClient.getPreGameMatch(playerData.MatchID)
+			const playerNames = await ValorantClient.getNames(preGameMatchData.AllyTeam.Players.map((player) => player.Subject))
 
 			updateBackground(preGameMatchData.MapID).catch(console.error)
 			clientTeamID = preGameMatchData.AllyTeam.TeamID
 
 			for (const ally of preGameMatchData.AllyTeam.Players) {
-				allies.push({
+				players.push({
 					Subject: ally.Subject,
 					TeamID: clientTeamID,
 					NameInfo: playerNames.find((playerName) => playerName.Subject === ally.Subject),
@@ -62,16 +101,17 @@
 				})
 			}
 
-			allies = allies // explicit update
+			players = players // explicit update
+			await fetchRanks()
 		} else if (clientState === "INGAME") {
 			console.log(new Date().toLocaleTimeString(), "Fetching CoreGame")
 
-			const playerData = await client.getCoreGamePlayerData(client.selfID)
-			coreGameMatchData = await client.getCoreGameMatch(playerData.MatchID)
-			const playerNames = await client.getNames(coreGameMatchData.Players.map((player) => player.Subject))
+			const playerData = await ValorantClient.getCoreGamePlayerData($ClientID)
+			coreGameMatchData = await ValorantClient.getCoreGameMatch(playerData.MatchID)
+			const playerNames = await ValorantClient.getNames(coreGameMatchData.Players.map((player) => player.Subject))
 
 			updateBackground(coreGameMatchData.MapID).catch(console.error)
-			clientTeamID = coreGameMatchData.Players.find((player) => player.Subject === client.selfID)?.TeamID
+			clientTeamID = coreGameMatchData.Players.find((player) => player.Subject === $ClientID)?.TeamID
 
 			for (const player of coreGameMatchData.Players) {
 				const newPlayerObj: Player = {
@@ -87,57 +127,17 @@
 					CurrentRankedRating: null,
 				}
 
-				if (player.TeamID === clientTeamID) {
-					const allyIndex = allies.findIndex((ally) => ally.Subject === player.Subject)
+				const playerIndex = players.findIndex((p) => p.Subject === newPlayerObj.Subject)
 
-					if (allyIndex !== -1) {
-						allies.splice(allyIndex, 1, newPlayerObj)
-					} else {
-						allies.push(newPlayerObj)
-					}
+				if (playerIndex !== -1) {
+					players.splice(playerIndex, 1, newPlayerObj)
 				} else {
-					enemies.push(newPlayerObj)
+					players.push(newPlayerObj)
 				}
 			}
 
-			allies = allies // explicit update
-			enemies = enemies // explicit update
-
-			for (const player of allies.concat(enemies)) {
-				await new Promise(resolve => setTimeout(resolve, 100))
-				const playerMMR = await client.getMMR(player.Subject)
-
-				if (playerMMR === null) {
-					console.error("PLAYER MMR REQUEST FAILED")
-					break
-				}
-
-				const seasonalInfoMap = playerMMR.QueueSkills?.competitive?.SeasonalInfoBySeasonID
-				let rankHighest = 0
-				let rankLowest = -1
-
-				for (const {CompetitiveTier} of Object.values(seasonalInfoMap ?? {})) {
-					if (rankHighest < CompetitiveTier) {
-						rankHighest = CompetitiveTier
-					}
-
-					if ((rankLowest > CompetitiveTier || rankLowest === -1) && CompetitiveTier > 2) {
-						rankLowest = CompetitiveTier
-					}
-				}
-
-				const currentSeasonStats = seasonalInfoMap?.[currentSeasonID]
-				const rankNow = currentSeasonStats?.CompetitiveTier ?? 0
-				const rrNow = currentSeasonStats?.RankedRating ?? 0
-
-				player.HighestTier = tierList[rankHighest]
-				player.CurrentTier = tierList[rankNow]
-				player.LowestTier = tierList[rankLowest]
-				player.CurrentRankedRating = rrNow
-
-				allies = allies // explicit update
-				enemies = enemies // explicit update
-			}
+			players = players // explicit update
+			await fetchRanks()
 		}
 	}
 
@@ -146,7 +146,7 @@
 		const tiersJson = await tiersResponse.json()
 		tierList = tiersJson?.data?.at(-1)?.["tiers"]
 
-		const content = await client.getContent()
+		const content = await ValorantClient.getContent()
 		const currentSeason = content.Seasons.find((season) => season.IsActive && season.Type === "act")
 		currentSeasonID = currentSeason.ID
 

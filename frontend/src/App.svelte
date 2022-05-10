@@ -3,8 +3,8 @@
 	import type { Unsubscriber } from "svelte/store"
 	//
 	import { EventsOff, EventsOnMultiple, WindowSetTitle } from "../wailsjs/runtime"
-	import { ValorantClient } from "./script/ValorantClient"
-	//import { ValorantClientMock } from "./script/ValorantClientMock"
+	//import { ValorantClient } from "./script/ValorantClient"
+	import { ValorantClient } from "./script/ValorantClientMock"
 	import { SaveLog } from "../wailsjs/go/utils/Utility"
 	//
 	import type { RawPresence, WebSocketPayload } from "./script/Typedef"
@@ -12,40 +12,23 @@
 	import Menus from "./components/Menus.svelte"
 	import InGame from "./components/InGame.svelte"
 	//
-	import { ClientState, Presences } from "./stores/Data"
+	import { ClientID, ClientState, Presences } from "./stores/ClientData"
+	import { SelfID } from "../wailsjs/go/valorant/Client"
 
 	let ready: boolean
-	let client: ValorantClient
 
 	let initLoopHandle: NodeJS.Timeout = null
 	let unsubscribeClientState: Unsubscriber
 
-	async function tryInit() {
-		console.debug(new Date().toLocaleTimeString(), "tryInit()")
+	async function syncWithClient() {
+		const selfID = await SelfID()
 
-		client = new ValorantClient()
-		ready = await client.init()
-
-		return ready
-	}
-
-	async function initLoop() {
-		if (await tryInit() === false) {
-			if (initLoopHandle === null) {
-				initLoopHandle = setInterval(initLoop, 5000)
-			}
-
-			return
+		if ($ClientID !== selfID) {
+			$ClientID = selfID
+			console.debug(new Date().toLocaleTimeString(), "ClientID assigned", $ClientID)
 		}
 
-		clearInterval(initLoopHandle)
-		initLoopHandle = null
-
-		await syncWithClient()
-	}
-
-	async function syncWithClient() {
-		const presences = await client.getPresences()
+		const presences = await ValorantClient.getPresences()
 
 		if (presences === null) {
 			console.error("syncWithClient failed")
@@ -53,29 +36,38 @@
 			return
 		}
 
-		console.debug("syncing presences")
 		$Presences = presences
 
-		const selfPresence = presences.find((presence) => presence.puuid === client.selfID)
+		const selfPresence = presences.find((presence) => presence.puuid === $ClientID)
 
 		if (selfPresence === undefined) {
 			return
 		}
 
-		console.debug("syncing client state")
-		$ClientState = selfPresence.private.sessionLoopState
+		const state = selfPresence.private.sessionLoopState
+
+		if ($ClientState !== state) {
+			$ClientState = state
+		}
 	}
 
 	onMount(() => {
 		//console.debug(new Date().toLocaleTimeString(), "onMount")
-		initLoop()
+		//initLoop()
 
-		EventsOnMultiple("wsClose", () => {
-			$ClientState = null
-			initLoop()
+		syncWithClient()
+
+		EventsOnMultiple("state", async (state) => {
+			if (state === true) {
+				$ClientID = await SelfID()
+				console.debug(new Date().toLocaleTimeString(), "ClientEvent::state READY")
+			} else if ($ClientState !== null) {
+				$ClientState = null
+				console.debug(new Date().toLocaleTimeString(), "ClientEvent::state no longer ready")
+			}
 		}, -1)
 
-		EventsOnMultiple("wsMsg", (data) => {
+		EventsOnMultiple("msg", (data) => {
 			if (data === "") {
 				return
 			}
@@ -103,7 +95,7 @@
 				//console.debug("WS chat_v4_presences:", payload.eventType, newPresences)
 				//console.debug("$Presences:", $Presences)
 
-				const selfPresence = $Presences.find((presence) => presence.puuid === client.selfID)
+				const selfPresence = $Presences.find((presence) => presence.puuid === $ClientID)
 
 				if (selfPresence === undefined) {
 					return
@@ -160,9 +152,9 @@
 		{/if}
 	{:else}
 		{#if $ClientState === "MENUS"}
-			<Menus client="{client}" />
+			<Menus />
 		{:else if ($ClientState === "INGAME" || $ClientState === "PREGAME")}
-			<InGame client="{client}" />
+			<InGame />
 		{/if}
 	{/if}
 </main>

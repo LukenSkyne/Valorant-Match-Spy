@@ -1,4 +1,3 @@
-import { ValorantClientBase } from "./ValorantClientBase"
 import { GetGlz, GetLocal, GetPd, PutPd, GetShared } from "../../wailsjs/go/valorant/Client.js"
 import { SaveLog } from "../../wailsjs/go/utils/Utility.js"
 
@@ -13,7 +12,7 @@ import type {
 	RawPresence,
 } from "./Typedef"
 
-export class ValorantClient extends ValorantClientBase {
+export class ValorantClient {
 
 	static processPresences(rawPresences: RawPresence[]): Presence[] {
 		const presences: Presence[] = []
@@ -30,7 +29,7 @@ export class ValorantClient extends ValorantClientBase {
 		return presences
 	}
 
-	async getPresences(): Promise<Presence[]> {
+	static async getPresences(): Promise<Presence[]> {
 		const rawPresences: RawPresence[] = JSON.parse(await GetLocal("/chat/v4/presences"))?.["presences"]
 
 		if (rawPresences === undefined) {
@@ -40,25 +39,25 @@ export class ValorantClient extends ValorantClientBase {
 		return ValorantClient.processPresences(rawPresences)
 	}
 
-	async getNames(playerUUIDs: string[]): Promise<PlayerNameInfo[]> {
+	static async getNames(playerUUIDs: string[]): Promise<PlayerNameInfo[]> {
 		return JSON.parse(await PutPd("/name-service/v2/players", JSON.stringify(playerUUIDs)))
 	}
 
-	async getMMR(playerUUID: string): Promise<PlayerMMR> {
+	static async getMMR(playerUUID: string): Promise<PlayerMMR> {
 		return JSON.parse(await GetPd(`/mmr/v1/players/${playerUUID}`))
 	}
 
-	async getContent(): Promise<Content> {
+	static async getContent(): Promise<Content> {
 		return JSON.parse(await GetShared("/content-service/v3/content"))
 	}
 
 	/* PreGame */
 
-	async getPreGamePlayerData(playerUUID: string): Promise<PlayerData> {
+	static async getPreGamePlayerData(playerUUID: string): Promise<PlayerData> {
 		return JSON.parse(await GetGlz(`/pregame/v1/players/${playerUUID}`))
 	}
 
-	async getPreGameMatch(matchUUID: string): Promise<PreGameMatch> {
+	static async getPreGameMatch(matchUUID: string): Promise<PreGameMatch> {
 		const matchData = JSON.parse(await GetGlz(`/pregame/v1/matches/${matchUUID}`))
 
 		SaveLog("glz_getPreGameMatch", JSON.stringify(matchData, null, "\t"))
@@ -66,7 +65,7 @@ export class ValorantClient extends ValorantClientBase {
 		return matchData
 	}
 
-	async getPreGameLoadouts(matchUUID: string) {
+	static async getPreGameLoadouts(matchUUID: string) {
 		const loadoutData = JSON.parse(await GetGlz(`/pregame/v1/matches/${matchUUID}/loadouts`))
 
 		SaveLog("glz_getPreGameLoadouts", JSON.stringify(loadoutData, null, "\t"))
@@ -76,11 +75,11 @@ export class ValorantClient extends ValorantClientBase {
 
 	/* CoreGame */
 
-	async getCoreGamePlayerData(playerUUID: string): Promise<PlayerData> {
+	static async getCoreGamePlayerData(playerUUID: string): Promise<PlayerData> {
 		return JSON.parse(await GetGlz(`/core-game/v1/players/${playerUUID}`))
 	}
 
-	async getCoreGameMatch(matchUUID: string): Promise<CoreGameMatch> {
+	static async getCoreGameMatch(matchUUID: string): Promise<CoreGameMatch> {
 		const matchData = JSON.parse(await GetGlz(`/core-game/v1/matches/${matchUUID}`))
 
 		SaveLog("glz_getCoreGameMatch", JSON.stringify(matchData, null, "\t"))
@@ -88,7 +87,7 @@ export class ValorantClient extends ValorantClientBase {
 		return matchData
 	}
 
-	async getCoreGameLoadouts(matchUUID: string) {
+	static async getCoreGameLoadouts(matchUUID: string) {
 		const loadoutData = JSON.parse(await GetGlz(`/core-game/v1/matches/${matchUUID}/loadouts`))
 
 		SaveLog("glz_getCoreGameLoadouts", JSON.stringify(loadoutData, null, "\t"))

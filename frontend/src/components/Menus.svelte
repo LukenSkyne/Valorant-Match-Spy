@@ -3,10 +3,7 @@
 	import { onDestroy, onMount } from "svelte"
 	import type { Unsubscriber } from "svelte/store"
 	//
-	import { Presences } from "../stores/Data"
-
-	// props
-	export let client: ValorantClient
+	import { Presences } from "../stores/ClientData"
 
 	// members
 	let unsubscribePresences: Unsubscriber
