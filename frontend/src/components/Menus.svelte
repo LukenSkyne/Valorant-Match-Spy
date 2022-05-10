@@ -20,5 +20,5 @@
 </script>
 
 <main class="container">
-	<span>In MENUS</span>
+	<span>Waiting for Game...</span>
 </main>

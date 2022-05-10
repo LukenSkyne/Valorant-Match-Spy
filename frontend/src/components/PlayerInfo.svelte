@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Player } from "./Typedef"
-	import { fade } from "svelte/transition"
+	import RankInfo from "./FloatingRankInfo.svelte"
 
 	export let player: Player
 	export let team: string
@@ -23,24 +23,10 @@
 		<div class="card">
 			<img alt src={playerCardImage} height="100%">
 			{#if player.HighestTier !== null || player.CurrentTier !== null}
-				<div class="floatingRankInfo" in:fade={{duration: 200 }}>
-					{#if player.HighestTier !== null}
-						<div class="rankInfo">
-							<span class="rankText">
-								Highest
-							</span>
-							<img alt src={player.HighestTier.smallIcon} height="100%">
-						</div>
-					{/if}
-					{#if player.CurrentTier !== null}
-						<div class="rankInfo">
-							<span class="rankText">
-								Current
-							</span>
-							<img alt src={player.CurrentTier.smallIcon} height="100%">
-						</div>
-					{/if}
-				</div>
+				<RankInfo highestTier={player.HighestTier}
+						  currentTier={player.CurrentTier}
+						  lowestTier={player.LowestTier}
+				/>
 			{/if}
 		</div>
 	</div>
@@ -48,6 +34,9 @@
 		<span class="playerName">{player.NameInfo.GameName}</span>
 		<span class="playerTag">#{player.NameInfo.TagLine}</span>
 		<span class="playerLevel">Level {player.PlayerIdentity.AccountLevel}</span>
+		{#if player.CurrentRankedRating !== null}
+			<span class="playerRR">{player.CurrentRankedRating ?? 0}RR</span>
+		{/if}
 	</div>
 </div>
 
@@ -83,39 +72,8 @@
         justify-content: center;
     }
 
-    .floatingRankInfo {
-        position: absolute;
-        right: 0;
-        padding: 4px;
-
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        gap: 4px;
-
-        background-color: #2227;
-        border-radius: 4px 0 0 4px;
-        backdrop-filter: blur(2px);
-    }
-
-    .rankInfo {
-        position: relative;
-        height: 32px;
-
-        display: flex;
-        flex-direction: row;
-
-        align-items: center;
-        justify-content: flex-end;
-        gap: 4px;
-    }
-
-    .rankText {
-        padding: 2px 6px;
-        font-size: 13px;
-    }
-
     .playerBottom {
+		position: relative;
         display: flex;
         align-items: center;
 
@@ -134,7 +92,7 @@
     }
 
     .playerName {
-		/* placeholder */
+        /* placeholder */
     }
 
     .playerTag {
@@ -142,7 +100,15 @@
     }
 
     .playerLevel {
-        margin-left: auto;
+		position: absolute;
+        left: 50%;
+        transform: translate(-25%, 0); /* change this to -50% to center it */
         color: hsl(var(--white) / 50%);
     }
+
+	.playerRR {
+        position: absolute;
+		right: 4px;
+        color: hsl(var(--white) / 50%);
+	}
 </style>

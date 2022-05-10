@@ -10,6 +10,9 @@
 	//
 	import { ClientID, ClientState } from "../stores/ClientData"
 
+	import DecorationTop from "../assets/images/DecorationTop.svelte"
+	import DecorationBot from "../assets/images/DecorationBot.svelte"
+
 	// members
 	let unsubscribeClientState: Unsubscriber
 	let preGameMatchData: PreGameMatch
@@ -38,6 +41,10 @@
 
 	async function fetchRanks() {
 		for (const player of players) {
+			if (player.CurrentTier !== null) {
+				continue
+			}
+
 			await new Promise(resolve => setTimeout(resolve, 100))
 			const playerMMR = await ValorantClient.getMMR(player.Subject)
 
@@ -47,29 +54,24 @@
 			}
 
 			const seasonalInfoMap = playerMMR.QueueSkills?.competitive?.SeasonalInfoBySeasonID
-			let rankHighest = 0
-			let rankLowest = -1
-
-			for (const {CompetitiveTier} of Object.values(seasonalInfoMap ?? {})) {
-				if (rankHighest < CompetitiveTier) {
-					rankHighest = CompetitiveTier
-				}
-
-				if ((rankLowest > CompetitiveTier || rankLowest === -1) && CompetitiveTier > 2) {
-					rankLowest = CompetitiveTier
-				}
-			}
-
 			const currentSeasonStats = seasonalInfoMap?.[currentSeasonID]
 			const rankNow = currentSeasonStats?.CompetitiveTier ?? 0
 			const rrNow = currentSeasonStats?.RankedRating ?? 0
+			//
+			const allRanksBySeason = Object.values(seasonalInfoMap).map((s) => Object.keys(s.WinsByTier ?? {}))
+			const allValidRanks = [].concat(...allRanksBySeason).filter((rank) => rank > 2)
+			//
+			const highestRank = allValidRanks.length > 0 ? Math.max(...allValidRanks) : null
+			const lowestRank = allValidRanks.length > 0 ? Math.min(...allValidRanks) : null
 
-			player.HighestTier = tierList[rankHighest]
+			player.HighestTier = tierList[highestRank] ?? null
 			player.CurrentTier = tierList[rankNow]
-			player.LowestTier = tierList[rankLowest]
+			player.LowestTier = tierList[lowestRank] ?? null
 			player.CurrentRankedRating = rrNow
 
 			console.debug("Player", player.NameInfo.GameName, player.HighestTier, player.CurrentTier, player.LowestTier)
+			console.log("seasonalInfoMap", seasonalInfoMap)
+			console.log("highestRank", highestRank, allValidRanks)
 
 			players = players // explicit update
 		}
@@ -146,6 +148,12 @@
 		const tiersJson = await tiersResponse.json()
 		tierList = tiersJson?.data?.at(-1)?.["tiers"]
 
+		tierList = tierList?.map((t) => {
+			t.tierName = t.tierName.charAt(0) + t.tierName.slice(1).toLowerCase()
+
+			return t
+		})
+
 		const content = await ValorantClient.getContent()
 		const currentSeason = content.Seasons.find((season) => season.IsActive && season.Type === "act")
 		currentSeasonID = currentSeason.ID
@@ -171,81 +179,11 @@
 					"A L L I E S"}
 			</span>
 
-			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 268.39 10.79">
-				<defs>
-					<style>.top-1, .top-2 {
-                        fill: none;
-                        stroke-miterlimit: 10;
-                    }
-
-                    .top-1 {
-                        stroke: #868998;
-                    }
-
-                    .top-2 {
-                        stroke: #eaeff3;
-                        stroke-width: 2px;
-                    }
-
-                    .top-3 {
-                        fill: #eaeff3;
-                    }
-					</style>
-				</defs>
-				<line class="top-1" x1="1.99" y1="5.05" x2="111.59" y2="5.05"/>
-				<line class="top-1" x1="266.4" y1="5.05" x2="156.79" y2="5.05"/>
-				<path class="top-2"
-					  d="M318.19,419.31h-15.3a4.7,4.7,0,0,0-2.9,1l-4.4,3.47-4.41-3.47a4.65,4.65,0,0,0-2.89-1H273"
-					  transform="translate(-161.39 -414.26)"/>
-				<rect class="top-3" x="293.97" y="414.93" width="3.23" height="3.23"
-					  transform="translate(-369.36 -83.24) rotate(-45)"/>
-				<rect class="top-3" x="161.83" y="418.25" width="2.11" height="2.11"
-					  transform="translate(-410.18 -176.27) rotate(-45)"/>
-				<rect class="top-3" x="427.23" y="418.25" width="2.11" height="2.11"
-					  transform="translate(-332.45 11.4) rotate(-45)"/>
-			</svg>
-
+			<DecorationTop />
 			{#each allies as ally}
 				<PlayerInfo player={ally} team="blue"/>
 			{/each}
-
-			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 268.39 23.54">
-				<defs>
-					<style>.bot-1 {
-                        fill: #585b60;
-                    }
-
-                    .bot-2, .bot-5 {
-                        fill: none;
-                        stroke-miterlimit: 10;
-                    }
-
-                    .bot-2 {
-                        stroke: #7f838c;
-                    }
-
-                    .bot-3 {
-                        fill: #eaeff3;
-                    }
-
-                    .bot-4 {
-                        fill: #f3f4f8;
-                    }
-
-                    .bot-5 {
-                        stroke: #f3f4f8;
-                    }
-					</style>
-				</defs>
-				<rect class="bot-1" x="130.53" y="3.93" width="7.32" height="19.61" rx="3.66"/>
-				<line class="bot-2" x1="266.4" y1="7.76" x2="1.99" y2="7.76"/>
-				<rect class="bot-3" x="102.69" y="560.68" width="2.11" height="2.11"
-					  transform="translate(-469.07 -316.09) rotate(-45)"/>
-				<rect class="bot-3" x="368.09" y="560.68" width="2.11" height="2.11"
-					  transform="translate(-391.34 -128.43) rotate(-45)"/>
-				<rect class="bot-4" x="132.69" y="6.64" width="3" height="14.2" rx="1.5"/>
-				<circle class="bot-5" cx="134.19" cy="7.76" r="7.26"/>
-			</svg>
+			<DecorationBot />
 		</div>
 	{/if}
 
@@ -254,81 +192,11 @@
 		<div class="teamContainer">
 			<span class="teamTitle" data-team="red">E N E M I E S</span>
 
-			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 268.39 10.79">
-				<defs>
-					<style>.top-1, .top-2 {
-                        fill: none;
-                        stroke-miterlimit: 10;
-                    }
-
-                    .top-1 {
-                        stroke: #868998;
-                    }
-
-                    .top-2 {
-                        stroke: #eaeff3;
-                        stroke-width: 2px;
-                    }
-
-                    .top-3 {
-                        fill: #eaeff3;
-                    }
-					</style>
-				</defs>
-				<line class="top-1" x1="1.99" y1="5.05" x2="111.59" y2="5.05"/>
-				<line class="top-1" x1="266.4" y1="5.05" x2="156.79" y2="5.05"/>
-				<path class="top-2"
-					  d="M318.19,419.31h-15.3a4.7,4.7,0,0,0-2.9,1l-4.4,3.47-4.41-3.47a4.65,4.65,0,0,0-2.89-1H273"
-					  transform="translate(-161.39 -414.26)"/>
-				<rect class="top-3" x="293.97" y="414.93" width="3.23" height="3.23"
-					  transform="translate(-369.36 -83.24) rotate(-45)"/>
-				<rect class="top-3" x="161.83" y="418.25" width="2.11" height="2.11"
-					  transform="translate(-410.18 -176.27) rotate(-45)"/>
-				<rect class="top-3" x="427.23" y="418.25" width="2.11" height="2.11"
-					  transform="translate(-332.45 11.4) rotate(-45)"/>
-			</svg>
-
+			<DecorationTop />
 			{#each enemies as enemy}
 				<PlayerInfo player={enemy} team="red"/>
 			{/each}
-
-			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 268.39 23.54">
-				<defs>
-					<style>.bot-1 {
-                        fill: #585b60;
-                    }
-
-                    .bot-2, .bot-5 {
-                        fill: none;
-                        stroke-miterlimit: 10;
-                    }
-
-                    .bot-2 {
-                        stroke: #7f838c;
-                    }
-
-                    .bot-3 {
-                        fill: #eaeff3;
-                    }
-
-                    .bot-4 {
-                        fill: #f3f4f8;
-                    }
-
-                    .bot-5 {
-                        stroke: #f3f4f8;
-                    }
-					</style>
-				</defs>
-				<rect class="bot-1" x="130.53" y="3.93" width="7.32" height="19.61" rx="3.66"/>
-				<line class="bot-2" x1="266.4" y1="7.76" x2="1.99" y2="7.76"/>
-				<rect class="bot-3" x="102.69" y="560.68" width="2.11" height="2.11"
-					  transform="translate(-469.07 -316.09) rotate(-45)"/>
-				<rect class="bot-3" x="368.09" y="560.68" width="2.11" height="2.11"
-					  transform="translate(-391.34 -128.43) rotate(-45)"/>
-				<rect class="bot-4" x="132.69" y="6.64" width="3" height="14.2" rx="1.5"/>
-				<circle class="bot-5" cx="134.19" cy="7.76" r="7.26"/>
-			</svg>
+			<DecorationBot />
 		</div>
 	{/if}
 </main>
@@ -366,8 +234,7 @@
         align-items: center;
         gap: 50px;
 
-        /*--background-url: url("https://preview.redd.it/je17twdg3jy61.png?width=1920&format=png&auto=webp&s=389d80f118a9ce37df13e772fde94e4344bd0d91");*/
-
+        --background-url: ""; /* custom property */
         background: rgba(0, 0, 0, 0.75) var(--background-url);
         background-size: cover;
         background-position: center;

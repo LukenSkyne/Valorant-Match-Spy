@@ -33,6 +33,8 @@ func main() {
 		Title:     "Valorant Match Spy",
 		Width:     1024,
 		Height:    768,
+		MinWidth:  1024,
+		MinHeight: 768,
 		Assets:    assets,
 		OnStartup: client.OnStartup,
 		Bind: []interface{}{
