@@ -19,6 +19,7 @@
 					"CompetitiveTier": 4,
 					"RankedRating": 44,
 					"WinsByTier": {
+						"12": 1,
 						"4": 4
 					},
 					"GamesNeededForRating": 0,

@@ -19,7 +19,8 @@
 					"CompetitiveTier": 0,
 					"RankedRating": 0,
 					"WinsByTier": {
-						"0": 1
+						"0": 1,
+						"24": 1
 					},
 					"GamesNeededForRating": 0,
 					"TotalWinsNeededForRank": 9
