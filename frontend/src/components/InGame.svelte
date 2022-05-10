@@ -69,10 +69,6 @@
 			player.LowestTier = tierList[lowestRank] ?? null
 			player.CurrentRankedRating = rrNow
 
-			console.debug("Player", player.NameInfo.GameName, player.HighestTier, player.CurrentTier, player.LowestTier)
-			console.log("seasonalInfoMap", seasonalInfoMap)
-			console.log("highestRank", highestRank, allValidRanks)
-
 			players = players // explicit update
 		}
 	}

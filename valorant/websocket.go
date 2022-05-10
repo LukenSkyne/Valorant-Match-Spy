@@ -20,15 +20,15 @@ type ConnectionInfo struct {
 }
 
 type WebSocket struct {
-	log  *zap.SugaredLogger
-	ctx  *context.Context
+	ctx *context.Context
+	log *zap.SugaredLogger
+
 	init chan bool
 }
 
-func NewWebSocket(log *zap.SugaredLogger, ctx *context.Context, init chan bool) *WebSocket {
+func NewWebSocket(log *zap.SugaredLogger, init chan bool) *WebSocket {
 	return &WebSocket{
 		log:  log,
-		ctx:  ctx,
 		init: init,
 	}
 }
@@ -102,6 +102,8 @@ func (w *WebSocket) Connect(ci ConnectionInfo) {
 
 			if w.ctx != nil {
 				runtime.EventsEmit(*w.ctx, "msg", message)
+			} else {
+				w.log.Error("WebSocket context is nil")
 			}
 		}
 

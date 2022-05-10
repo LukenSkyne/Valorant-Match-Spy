@@ -4,7 +4,7 @@
 
 	export let highestTier: CompetitiveTier
 	export let currentTier: CompetitiveTier
-	//export let lowestTier: CompetitiveTier
+	export let lowestTier: CompetitiveTier
 
 	const colorMap = {
 		"IRON": "bebebe",
@@ -24,12 +24,10 @@
 
 	function onMouseEnter() {
 		showInfo = true
-		console.log("onMouseEnter")
 	}
 
 	function onMouseLeave() {
 		showInfo = false
-		console.log("onMouseLeave")
 	}
 </script>
 

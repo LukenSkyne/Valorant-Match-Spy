@@ -53,6 +53,7 @@ func NewClient(log *zap.SugaredLogger) *Client {
 
 func (c *Client) OnStartup(ctx context.Context) {
 	c.ctx = &ctx
+	c.integration.ctx = &ctx
 }
 
 func (c *Client) Run() {
@@ -115,7 +116,7 @@ func (c *Client) init() bool {
 	localHost := fmt.Sprintf("%v://127.0.0.1:%v", c.integrationInfo.Protocol, c.integrationInfo.Port)
 	localAuth := "Basic " + base64.StdEncoding.EncodeToString([]byte("riot:"+c.integrationInfo.Password))
 
-	c.integration = NewWebSocket(c.log, c.ctx, c.initChan)
+	c.integration = NewWebSocket(c.log, c.initChan)
 	c.integration.Connect(ConnectionInfo{
 		Protocol: "wss",
 		Host:     "localhost",
