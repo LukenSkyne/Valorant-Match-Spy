@@ -3,13 +3,12 @@
 	import type { Unsubscriber } from "svelte/store"
 	//
 	import { ValorantClient } from "../script/ValorantClient"
-	//import { ValorantClient } from "../script/ValorantClientMock"
 	import type { CoreGameMatch, MatchTeam, PreGameMatch, SessionLoopState } from "../script/Typedef"
 	import type { CompetitiveTier, Player } from "./Typedef"
-	import PlayerInfo from "./PlayerInfo.svelte"
 	//
 	import { ClientID, ClientState } from "../stores/ClientData"
-
+	//
+	import PlayerInfo from "./PlayerInfo.svelte"
 	import DecorationTop from "../assets/images/DecorationTop.svelte"
 	import DecorationBot from "../assets/images/DecorationBot.svelte"
 
@@ -155,7 +154,7 @@
 		currentSeasonID = currentSeason.ID
 
 		unsubscribeClientState = ClientState.subscribe((clientState) => {
-			console.log("InGame | clientState:", clientState)
+			console.debug("InGame | clientState:", clientState)
 			fetchMatch(clientState)
 		})
 	})

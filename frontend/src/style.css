@@ -1,4 +1,12 @@
 
+@font-face {
+    font-family: "DIN Next LT";
+    font-style: normal;
+    font-weight: 400;
+    src: local(""),
+    url("assets/fonts/din-next-lt-regular.woff2") format("woff2");
+}
+
 html {
     background-color: #222222;
 }
@@ -7,14 +15,6 @@ body {
     margin: 0;
     color: white;
     font-family: "DIN Next LT", sans-serif;
-}
-
-@font-face {
-    font-family: "DIN Next LT";
-    font-style: normal;
-    font-weight: 400;
-    src: local(""),
-    url("assets/fonts/din-next-lt-regular.woff2") format("woff2");
 }
 
 #app {
@@ -29,24 +29,4 @@ body {
 
     align-items: center;
     justify-content: center;
-}
-
-.btn {
-    width: 60px;
-    height: 30px;
-    line-height: 30px;
-    border-radius: 3px;
-    border: none;
-    margin: 0 0 0 20px;
-    padding: 0 8px;
-    cursor: pointer;
-}
-
-.btn:hover {
-    background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
-    color: #333333;
-}
-
-.btn:active:hover {
-    background-image: linear-gradient(to top, #a5c7dc 0%, #c2ddec 100%);
 }

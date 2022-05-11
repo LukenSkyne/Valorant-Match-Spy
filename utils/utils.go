@@ -17,7 +17,7 @@ func NewUtility(log *zap.SugaredLogger) *Utility {
 	}
 }
 
-func (u *Utility) SaveLog(name string, content string) {
+func (u *Utility) saveLog(name string, content string) {
 	t := time.Now()
 	fileName := fmt.Sprintf("%v_%v.json", t.Format("2006.01.02_15-04-05"), name)
 	filePath := fmt.Sprintf("C:/Users/Luken/Downloads/requests/%v", fileName)

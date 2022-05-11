@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { ValorantClient } from "../script/ValorantClient"
 	import { onDestroy, onMount } from "svelte"
 	import type { Unsubscriber } from "svelte/store"
+	//
+	import { ValorantClient } from "../script/ValorantClient"
 	//
 	import { Presences } from "../stores/ClientData"
 
