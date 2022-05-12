@@ -2,13 +2,12 @@ package main
 
 import (
 	"embed"
-	"go.uber.org/zap/zapcore"
-	"match-spy/utils"
-	"match-spy/valorant"
-
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"match-spy/internal/utils"
+	"match-spy/internal/valorant"
 )
 
 //go:embed frontend/dist

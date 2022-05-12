@@ -1,4 +1,4 @@
-package valorant
+package utils
 
 import (
 	"bytes"
@@ -30,11 +30,11 @@ func NewRemote(log *zap.SugaredLogger, host string, reqIntercept func(req *http.
 	}
 }
 
-func (r *Remote) get(url string) (*http.Response, error) {
-	return r.request(http.MethodGet, url, nil)
+func (r *Remote) Get(url string) (*http.Response, error) {
+	return r.Request(http.MethodGet, url, nil)
 }
 
-func (r *Remote) request(method string, url string, payload *string) (*http.Response, error) {
+func (r *Remote) Request(method string, url string, payload *string) (*http.Response, error) {
 	var body io.Reader = nil
 
 	if payload != nil {

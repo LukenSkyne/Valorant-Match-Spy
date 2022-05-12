@@ -10,6 +10,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"go.uber.org/zap"
 	"io"
+	"match-spy/internal/utils"
 	"net/http"
 	"time"
 )
@@ -31,14 +32,14 @@ type Client struct {
 	initChan chan bool
 
 	integrationInfo *IntegrationInfo
-	integration     *WebSocket
+	integration     *utils.WebSocket
 	credentials     *Credentials
 	clientInfo      *ClientInfo
 
-	local  *Remote
-	shared *Remote
-	glz    *Remote
-	pd     *Remote
+	local  *utils.Remote
+	shared *utils.Remote
+	glz    *utils.Remote
+	pd     *utils.Remote
 }
 
 func NewClient(log *zap.SugaredLogger) *Client {
@@ -53,7 +54,10 @@ func NewClient(log *zap.SugaredLogger) *Client {
 
 func (c *Client) OnStartup(ctx context.Context) {
 	c.ctx = &ctx
-	c.integration.ctx = &ctx
+
+	if c.integration != nil {
+		c.integration.Ctx = &ctx
+	}
 }
 
 func (c *Client) Run() {
@@ -116,8 +120,8 @@ func (c *Client) init() bool {
 	localHost := fmt.Sprintf("%v://127.0.0.1:%v", c.integrationInfo.Protocol, c.integrationInfo.Port)
 	localAuth := "Basic " + base64.StdEncoding.EncodeToString([]byte("riot:"+c.integrationInfo.Password))
 
-	c.integration = NewWebSocket(c.log, c.initChan)
-	c.integration.Connect(ConnectionInfo{
+	c.integration = utils.NewWebSocket(c.log, c.initChan)
+	c.integration.Connect(utils.ConnectionInfo{
 		Protocol: "wss",
 		Host:     "localhost",
 		Port:     c.integrationInfo.Port,
@@ -128,8 +132,9 @@ func (c *Client) init() bool {
 			"OnJsonApiEvent_chat_v6_conversations",
 		},
 	})
+	c.integration.Ctx = c.ctx
 
-	c.local = NewRemote(c.log, localHost, func(req *http.Request) {
+	c.local = utils.NewRemote(c.log, localHost, func(req *http.Request) {
 		req.Header.Set("Authorization", localAuth)
 	})
 
@@ -153,7 +158,7 @@ func (c *Client) init() bool {
 }
 
 func (c *Client) fetchCredentials() error {
-	resp, err := c.local.get("/entitlements/v1/token")
+	resp, err := c.local.Get("/entitlements/v1/token")
 
 	if err != nil {
 		return err
@@ -191,9 +196,9 @@ func (c *Client) buildRemotes() {
 		req.Header.Set("User-Agent", "ShooterGame/13 Windows/10.0.22000.1.256.64bit")
 	}
 
-	c.shared = NewRemote(c.log, c.clientInfo.SharedHost, interceptor)
-	c.glz = NewRemote(c.log, c.clientInfo.GlzHost, interceptor)
-	c.pd = NewRemote(c.log, c.clientInfo.PdHost, interceptor)
+	c.shared = utils.NewRemote(c.log, c.clientInfo.SharedHost, interceptor)
+	c.glz = utils.NewRemote(c.log, c.clientInfo.GlzHost, interceptor)
+	c.pd = utils.NewRemote(c.log, c.clientInfo.PdHost, interceptor)
 }
 
 func (c *Client) parseCredentials() error {
@@ -242,7 +247,7 @@ func extractClaims(tokenString string) (*jwt.MapClaims, error) {
 	return &claims, nil
 }
 
-func (c *Client) requestRemotely(r *Remote, method string, url string, payload *string) *string {
+func (c *Client) requestRemotely(r *utils.Remote, method string, url string, payload *string) *string {
 	if !c.ready {
 		return nil
 	}
@@ -255,7 +260,7 @@ func (c *Client) requestRemotely(r *Remote, method string, url string, payload *
 		}
 	}
 
-	resp, err := r.request(method, url, payload)
+	resp, err := r.Request(method, url, payload)
 
 	if err != nil {
 		c.log.Errorf("Request Error: %v", err.Error())

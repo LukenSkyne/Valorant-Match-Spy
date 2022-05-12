@@ -1,4 +1,4 @@
-package valorant
+package utils
 
 import (
 	"context"
@@ -20,7 +20,7 @@ type ConnectionInfo struct {
 }
 
 type WebSocket struct {
-	ctx *context.Context
+	Ctx *context.Context
 	log *zap.SugaredLogger
 
 	init chan bool
@@ -100,8 +100,8 @@ func (w *WebSocket) Connect(ci ConnectionInfo) {
 				w.log.Errorf("Invalid WebSocket message: %v", message)
 			}
 
-			if w.ctx != nil {
-				runtime.EventsEmit(*w.ctx, "msg", message)
+			if w.Ctx != nil {
+				runtime.EventsEmit(*w.Ctx, "msg", message)
 			} else {
 				w.log.Error("WebSocket context is nil")
 			}

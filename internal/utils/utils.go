@@ -17,6 +17,7 @@ func NewUtility(log *zap.SugaredLogger) *Utility {
 	}
 }
 
+// currently not exported, mostly required to explore responses from the Client API
 func (u *Utility) saveLog(name string, content string) {
 	t := time.Now()
 	fileName := fmt.Sprintf("%v_%v.json", t.Format("2006.01.02_15-04-05"), name)
