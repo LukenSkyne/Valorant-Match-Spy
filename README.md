@@ -9,20 +9,14 @@
     yet another desktop application to spy on your fellow players
 </p>
 
-<p align="center">
-  <a href="https://github.com/LukenSkyne/Valorant-Match-Spy/releases/latest">
-    <img alt="Total Downloads" src="https://img.shields.io/github/downloads/LukenSkyne/Valorant-Match-Spy/total">
-  </a>
-  <a href="https://github.com/LukenSkyne/Valorant-Match-Spy/stargazers">
-    <img alt="Total Stars" src="https://img.shields.io/github/stars/LukenSkyne/Valorant-Match-Spy">
-  </a>
-  <a href="https://github.com/LukenSkyne/Valorant-Match-Spy/blob/main/LICENSE">
-    <img alt="MIT License" src="https://img.shields.io/github/license/LukenSkyne/Valorant-Match-Spy">
-  </a>
-  <a href="https://github.com/LukenSkyne/Valorant-Match-Spy/issues">
-    <img alt="Contributions are Welcome" src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat" />
-  </a>
-</p>
+<div align="center">
+
+<a href="https://github.com/LukenSkyne/Valorant-Match-Spy/releases/latest">![Total Downloads](https://img.shields.io/github/downloads/LukenSkyne/Valorant-Match-Spy/total)</a>
+<a href="https://github.com/LukenSkyne/Valorant-Match-Spy/stargazers">![Total Stars](https://img.shields.io/github/stars/LukenSkyne/Valorant-Match-Spy)</a>
+<a href="https://github.com/LukenSkyne/Valorant-Match-Spy/blob/main/LICENSE">![MIT License](https://img.shields.io/github/license/LukenSkyne/Valorant-Match-Spy)</a>
+<a href="https://github.com/LukenSkyne/Valorant-Match-Spy/issues">![Contributions are Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)</a>
+
+</div>
 
 ## About
 
