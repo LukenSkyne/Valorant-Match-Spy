@@ -21,6 +21,10 @@
 			$ClientID = selfID
 		}
 
+		if (selfID === null) {
+			return
+		}
+
 		const presences = await ValorantClient.getPresences()
 
 		if (presences === null) {
@@ -48,11 +52,11 @@
 
 		EventsOnMultiple("state", async (state) => {
 			if (state === true) {
-				$ClientID = await SelfID()
 				console.debug(new Date().toLocaleTimeString(), "ClientEvent::state READY")
+				await syncWithClient()
 			} else if ($ClientState !== null) {
-				$ClientState = null
 				console.debug(new Date().toLocaleTimeString(), "ClientEvent::state no longer ready")
+				$ClientState = null
 			}
 		}, -1)
 
