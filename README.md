@@ -10,6 +10,12 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/LukenSkyne/Valorant-Match-Spy/releases/latest">
+    <img alt="Total Downloads" src="https://img.shields.io/github/downloads/LukenSkyne/Valorant-Match-Spy/total">
+  </a>
+  <a href="https://github.com/LukenSkyne/Valorant-Match-Spy/stargazers">
+    <img alt="Total Stars" src="https://img.shields.io/github/stars/LukenSkyne/Valorant-Match-Spy">
+  </a>
   <a href="https://github.com/LukenSkyne/Valorant-Match-Spy/blob/main/LICENSE">
     <img alt="MIT License" src="https://img.shields.io/github/license/LukenSkyne/Valorant-Match-Spy">
   </a>
