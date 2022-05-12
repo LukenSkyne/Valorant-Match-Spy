@@ -33,6 +33,10 @@ which runs a [Go](https://go.dev/) application with a [Svelte](https://svelte.de
   * while in agent select, the app will display details about your Allies
   * while in-game, the app will display details about every Player
 
+Note that the following screenshot depicts how the app recreates a loading screen style overview of the players.
+
+<img src="assets/screenshot-ingame.png" alt="Logo">
+
 ## Development & Compiling yourself
 
 * To run in live development mode, run `wails dev` in the project directory.
