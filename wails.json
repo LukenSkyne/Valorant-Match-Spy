@@ -7,5 +7,8 @@
   "frontend:dev:serverUrl": "http://localhost:3000",
   "author": {
     "name": "Luken#1104"
+  },
+  "info": {
+    "copyright": "Copyright © 2022 LukenSkyne"
   }
 }
