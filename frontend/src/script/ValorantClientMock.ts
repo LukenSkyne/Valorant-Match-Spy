@@ -11,6 +11,11 @@ import type {
 } from "./Typedef"
 
 export class ValorantClient {
+
+	static async getSelfID() {
+		return "da85bcae-8416-54f6-a264-78454da9b9ef"
+	}
+
 	static processPresences(rawPresences: RawPresence[]): Presence[] {
 		return ValorantClientReal.processPresences(rawPresences)
 	}

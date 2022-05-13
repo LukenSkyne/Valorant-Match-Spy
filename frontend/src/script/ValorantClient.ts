@@ -1,4 +1,4 @@
-import { GetGlz, GetLocal, GetPd, PutPd, GetShared } from "../../wailsjs/go/valorant/Client.js"
+import { GetGlz, GetLocal, GetPd, PutPd, GetShared, SelfID } from "../../wailsjs/go/valorant/Client.js"
 
 import type {
 	Content,
@@ -12,6 +12,10 @@ import type {
 } from "./Typedef"
 
 export class ValorantClient {
+
+	static async getSelfID() {
+		return SelfID()
+	}
 
 	static processPresences(rawPresences: RawPresence[]): Presence[] {
 		const presences: Presence[] = []

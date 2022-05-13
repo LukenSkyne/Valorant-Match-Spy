@@ -77,7 +77,7 @@ func (c *Client) Run() {
 				c.log.Debug("Init requested")
 			}
 
-			if c.ctx != nil {
+			if c.ready && c.ctx != nil {
 				runtime.EventsEmit(*c.ctx, "state", false)
 			}
 

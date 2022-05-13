@@ -7,7 +7,6 @@
 	import type { RawPresence, WebSocketPayload } from "./script/Typedef"
 	//
 	import { ClientID, ClientState, Presences } from "./stores/ClientData"
-	import { SelfID } from "../wailsjs/go/valorant/Client"
 	//
 	import Menus from "./components/Menus.svelte"
 	import InGame from "./components/InGame.svelte"
@@ -15,7 +14,7 @@
 	let unsubscribeClientState: Unsubscriber
 
 	async function syncWithClient() {
-		const selfID = await SelfID()
+		const selfID = await ValorantClient.getSelfID()
 
 		if ($ClientID !== selfID) {
 			$ClientID = selfID
