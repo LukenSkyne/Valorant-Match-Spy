@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount, onDestroy } from "svelte"
-	import type { Unsubscriber } from "svelte/store"
 	//
 	import { EventsOff, EventsOnMultiple } from "../wailsjs/runtime"
 	import { ValorantClient } from "./script/ValorantClient"
@@ -10,6 +9,7 @@
 	//
 	import Menus from "./components/Menus.svelte"
 	import InGame from "./components/InGame.svelte"
+	import VersionCheck from "./components/VersionCheck.svelte"
 
 	async function syncWithClient() {
 		const selfID = await ValorantClient.getSelfID()
@@ -119,6 +119,7 @@
 <main class="container">
 	{#if $ClientState === null}
 		<span>Waiting for Valorant to Start...</span>
+		<VersionCheck />
 	{:else}
 		{#if $ClientState === "MENUS"}
 			<Menus />
