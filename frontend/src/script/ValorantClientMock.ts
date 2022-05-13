@@ -21,61 +21,9 @@ export class ValorantClient {
 	}
 
 	static async getPresences(): Promise<Presence[]> {
-		return [{
-			actor: "",
-			basic: "",
-			details: "",
-			game_name: "Luken",
-			game_tag: "1337",
-			location: null,
-			msg: null,
-			name: "LukenSkyne",
-			patchline: null,
-			pid: "",
-			platform: null,
-			private: {
-				accountLevel: 144,
-				competitiveTier: 3,
-				customGameName: "",
-				customGameTeam: "TeamOne",
-				isIdle: false,
-				isPartyOwner: false,
-				isValid: true,
-				leaderboardPosition: 0,
-				matchMap: "/Game/Maps/Ascent/Ascent",
-				maxPartySize: 5,
-				partyAccessibility: "CLOSED",
-				partyClientVersion: "release-04.08-shipping-15-701907",
-				partyId: "", // uuid
-				partyLFM: false,
-				partyOwnerMatchCurrentTeam: "Red",
-				partyOwnerMatchMap: "",
-				partyOwnerMatchScoreAllyTeam: 6,
-				partyOwnerMatchScoreEnemyTeam: 3,
-				partyOwnerProvisioningFlow: "Invalid",
-				partyOwnerSessionLoopState: "MENUS",
-				partySize: 5,
-				partyState: "DEFAULT",
-				partyVersion: 13337,
-				playerCardId: "string", // uuid
-				playerTitleId: "string", // uuid
-				preferredLevelBorderId: "string",
-				provisioningFlow: "Invalid",
-				queueEntryTime: "2022.05.03-23.08.47", // "2022.05.03-23.08.47"
-				queueId: "competitive",
-				rosterId: "string",
-				sessionLoopState: "INGAME",
-				tournamentId: "string",
-			},
-			privateJwt: null,
-			product: "valorant",
-			puuid: "da85bcae-8416-54f6-a264-78454da9b9ef",
-			region: "eu1",
-			resource: "string",
-			state: "away",
-			summary: "summary",
-			time: 13337,
-		}]
+		const imp = (await import(`./mockData/local_getPresences.json`)).default
+
+		return imp as unknown as Presence[]
 	}
 
 	static async getNames(playerUUIDs: string[]): Promise<PlayerNameInfo[]> {
