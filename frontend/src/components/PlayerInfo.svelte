@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { fade } from "svelte/transition"
+	//
 	import type { Player } from "./Typedef"
 	//
 	import { ClientID } from "../stores/ClientData"
@@ -11,9 +13,10 @@
 	$: dataTeam = $ClientID === player.Subject ? "self" : team
 	$: agentImage = `https://media.valorant-api.com/agents/${player.CharacterID}/displayicon.png`
 	$: playerCardImage = `https://media.valorant-api.com/playercards/${player.PlayerIdentity.PlayerCardID}/wideart.png`
+	$: partyStyle = player.PartyColor === null ? null : `background-color: ${player.PartyColor}`
 </script>
 
-<div>
+<div class="playerInfo">
 	<div class="playerTop">
 		{#if player.CharacterID !== null}
 			<img alt src={agentImage} class="agent" data-team={dataTeam}>
@@ -42,9 +45,16 @@
 			<span class="playerRR">{player.CurrentRankedRating ?? 0}RR</span>
 		{/if}
 	</div>
+	{#if partyStyle !== null}
+		<div class="party" style={partyStyle} in:fade={{duration: 200 }}></div>
+	{/if}
 </div>
 
 <style>
+	.playerInfo {
+        position: relative;
+	}
+	
     .playerTop {
         height: 92px;
         display: flex;
@@ -78,6 +88,18 @@
         display: flex;
         align-items: center;
         justify-content: center;
+    }
+
+    .party {
+        position: absolute;
+
+		--width: 5px;
+		--gap: 3px;
+
+        width: var(--width);
+        height: 100%;
+        left: calc((var(--gap) + var(--width)) * -1);
+        top: 0;
     }
 
     .playerBottom {

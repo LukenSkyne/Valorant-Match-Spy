@@ -21,5 +21,5 @@
 </script>
 
 <main class="container">
-	<span>Waiting for Game...</span>
+	<span>Waiting for Match...</span>
 </main>

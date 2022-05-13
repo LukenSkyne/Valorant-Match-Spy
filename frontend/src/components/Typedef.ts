@@ -4,6 +4,7 @@ export interface Player {
 	Subject: string // uuid
 	TeamID: MatchTeam
 	CharacterID: string | null
+	PartyColor: string | null
 	PlayerIdentity: PlayerIdentity
 	SeasonalBadgeInfo: SeasonalBadgeInfo
 	NameInfo: PlayerNameInfo

@@ -1,6 +1,7 @@
 <script lang="ts">
-	import type { CompetitiveTier } from "./Typedef"
 	import { fade } from "svelte/transition"
+	//
+	import type { CompetitiveTier } from "./Typedef"
 
 	export let highestTier: CompetitiveTier
 	export let currentTier: CompetitiveTier

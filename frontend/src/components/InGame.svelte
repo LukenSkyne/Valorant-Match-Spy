@@ -6,7 +6,7 @@
 	import type { CoreGameMatch, MatchTeam, PreGameMatch, SessionLoopState } from "../script/Typedef"
 	import type { CompetitiveTier, Player } from "./Typedef"
 	//
-	import { ClientID, ClientState } from "../stores/ClientData"
+	import { ClientID, ClientState, Presences } from "../stores/ClientData"
 	//
 	import PlayerInfo from "./PlayerInfo.svelte"
 	import DecorationTop from "../assets/images/DecorationTop.svelte"
@@ -14,6 +14,7 @@
 
 	// members
 	let unsubscribeClientState: Unsubscriber
+	let unsubscribePresences: Unsubscriber
 	let preGameMatchData: PreGameMatch
 	let coreGameMatchData: CoreGameMatch
 	let clientTeamID: MatchTeam
@@ -95,10 +96,12 @@
 					CurrentTier: null,
 					LowestTier: null,
 					CurrentRankedRating: null,
+					PartyColor: null,
 				})
 			}
 
 			players = players // explicit update
+			assignPartyColors()
 			await fetchRanks()
 		} else if (clientState === "INGAME") {
 			console.log(new Date().toLocaleTimeString(), "Fetching CoreGame")
@@ -122,6 +125,7 @@
 					CurrentTier: null,
 					LowestTier: null,
 					CurrentRankedRating: null,
+					PartyColor: null,
 				}
 
 				const playerIndex = players.findIndex((p) => p.Subject === newPlayerObj.Subject)
@@ -134,7 +138,39 @@
 			}
 
 			players = players // explicit update
+			assignPartyColors()
 			await fetchRanks()
+		}
+	}
+
+	function assignPartyColors() {
+		const colorPalette = [
+			"#7adfbc",
+			"#6fc8ff",
+			"#b36edc",
+			"#FF6F91",
+			"#FF9671",
+			"#FFC75F",
+			"#9ef971",
+		]
+		let colorIndex = 0
+		const parties = {}
+
+		for (const player of players) {
+			const presence = $Presences.find((p) => p.puuid === player.Subject)
+
+			if (presence === undefined ||
+				presence.private === null ||
+				presence.private.partyId === null ||
+				presence.private.partyId === "" ||
+				presence.private.partySize < 2) {
+				continue
+			}
+
+			const partyID = presence.private.partyId
+			parties[partyID] ??= colorPalette[colorIndex++]
+
+			player.PartyColor = parties[partyID]
 		}
 	}
 
@@ -157,10 +193,15 @@
 			console.debug("InGame | clientState:", clientState)
 			fetchMatch(clientState)
 		})
+
+		unsubscribePresences = Presences.subscribe((presences) => {
+			assignPartyColors()
+		})
 	})
 
 	onDestroy(() => {
 		unsubscribeClientState?.()
+		unsubscribePresences?.()
 	})
 </script>
 
