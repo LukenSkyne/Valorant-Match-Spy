@@ -2,7 +2,7 @@
 	import { onMount, onDestroy } from "svelte"
 	import type { Unsubscriber } from "svelte/store"
 	//
-	import { EventsOff, EventsOnMultiple, WindowSetTitle } from "../wailsjs/runtime"
+	import { EventsOff, EventsOnMultiple } from "../wailsjs/runtime"
 	import { ValorantClient } from "./script/ValorantClient"
 	import type { RawPresence, WebSocketPayload } from "./script/Typedef"
 	//
@@ -10,8 +10,6 @@
 	//
 	import Menus from "./components/Menus.svelte"
 	import InGame from "./components/InGame.svelte"
-
-	let unsubscribeClientState: Unsubscriber
 
 	async function syncWithClient() {
 		const selfID = await ValorantClient.getSelfID()
@@ -110,20 +108,11 @@
 				//SaveLog("WS_" + eventShort, JSON.stringify(payload, null, "\t"))
 			}
 		}, -1)
-
-		unsubscribeClientState = ClientState.subscribe((value) => {
-			if (value !== null) {
-				WindowSetTitle(`Valorant Match Spy - ${value}`)
-			} else {
-				WindowSetTitle("Valorant Match Spy")
-			}
-		})
 	})
 
 	onDestroy(() => {
 		EventsOff("state")
 		EventsOff("msg")
-		unsubscribeClientState()
 	})
 </script>
 

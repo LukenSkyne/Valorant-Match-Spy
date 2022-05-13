@@ -31,6 +31,7 @@ type Client struct {
 	ready    bool
 	initChan chan bool
 
+	selfUpdater     *utils.SelfUpdater
 	integrationInfo *IntegrationInfo
 	integration     *utils.WebSocket
 	credentials     *Credentials
@@ -46,6 +47,7 @@ func NewClient(log *zap.SugaredLogger) *Client {
 	return &Client{
 		log:             log,
 		initChan:        make(chan bool),
+		selfUpdater:     utils.NewSelfUpdater(log),
 		integrationInfo: NewIntegrationInfo(),
 		credentials:     &Credentials{},
 		clientInfo:      NewClientInfo(),
@@ -57,6 +59,25 @@ func (c *Client) OnStartup(ctx context.Context) {
 
 	if c.integration != nil {
 		c.integration.Ctx = &ctx
+	}
+
+	c.selfUpdater.CheckForUpdate()
+	runtime.WindowSetTitle(ctx, "Valorant Match Spy v"+c.selfUpdater.GetCurrentVersion())
+}
+
+func (c *Client) GetLatestVersion() *string {
+	if c.selfUpdater.CheckForUpdate() {
+		versionString := c.selfUpdater.GetLatestVersion()
+
+		return &versionString
+	}
+
+	return nil
+}
+
+func (c *Client) PerformSelfUpdate() {
+	if c.ctx != nil && c.selfUpdater.DoSelfUpdate() {
+		runtime.Quit(*c.ctx)
 	}
 }
 
