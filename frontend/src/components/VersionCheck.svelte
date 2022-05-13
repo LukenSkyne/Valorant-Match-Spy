@@ -16,7 +16,7 @@
 
 <main class="versionContainer">
 	{#if latestVersion !== null}
-		<span>latest version: {latestVersion}</span>
+		<span>latest version: v{latestVersion}</span>
 		<button on:click={onButtonUpdateNow}>
 			Update Now
 		</button>
