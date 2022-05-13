@@ -1,10 +1,14 @@
 <script lang="ts">
 	import type { Player } from "./Typedef"
+	//
+	import { ClientID } from "../stores/ClientData"
+	//
 	import RankInfo from "./FloatingRankInfo.svelte"
 
 	export let player: Player
 	export let team: string
 
+	$: dataTeam = $ClientID === player.Subject ? "self" : team
 	$: agentImage = `https://media.valorant-api.com/agents/${player.CharacterID}/displayicon.png`
 	$: playerCardImage = `https://media.valorant-api.com/playercards/${player.PlayerIdentity.PlayerCardID}/wideart.png`
 </script>
@@ -12,9 +16,9 @@
 <div>
 	<div class="playerTop">
 		{#if player.CharacterID !== null}
-			<img alt src={agentImage} class="agent" data-team={team}>
+			<img alt src={agentImage} class="agent" data-team={dataTeam}>
 		{:else}
-			<div class="agent" data-team={team}>
+			<div class="agent" data-team={dataTeam}>
 				<img alt
 					 src="https://media.valorant-api.com/agents/dade69b4-4f5a-8528-247b-219e5a1facd6/displayicon.png"
 					 style="filter: opacity(15%)" height="100%">
@@ -30,7 +34,7 @@
 			{/if}
 		</div>
 	</div>
-	<div class="playerBottom" data-team={team}>
+	<div class="playerBottom" data-team={dataTeam}>
 		<span class="playerName">{player.NameInfo.GameName}</span>
 		<span class="playerTag">#{player.NameInfo.TagLine}</span>
 		<span class="playerLevel">Level {player.PlayerIdentity.AccountLevel}</span>
@@ -64,6 +68,10 @@
         background-color: hsl(var(--red-darker) / 50%);
     }
 
+    .agent[data-team="self"] {
+        background-color: hsl(var(--yellow-darker) / 100%);
+    }
+
     .card {
         position: relative;
 
@@ -90,6 +98,14 @@
     .playerBottom[data-team="red"] {
         background-color: hsl(var(--red-dark) / 50%);
     }
+
+    .playerBottom[data-team="self"] {
+        background-color: hsl(var(--yellow-dark) / 100%);
+    }
+
+	.playerBottom[data-team="self"] :is(.playerName, .playerTag, .playerLevel, .playerRR) {
+		filter: invert();
+	}
 
     .playerName {
         /* placeholder */

@@ -211,6 +211,9 @@
         --red-dark: 353deg 40% 50%;
         --red-darker: 353deg 40% 30%;
 
+		--yellow-dark: 48deg 87% 83%;
+		--yellow-darker: 49deg 28% 63%;
+
         --white: 0deg 100% 100%;
     }
 
