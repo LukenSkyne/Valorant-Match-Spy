@@ -172,6 +172,8 @@
 
 			player.PartyColor = parties[partyID]
 		}
+
+		players = players // explicit update
 	}
 
 	onMount(async () => {
