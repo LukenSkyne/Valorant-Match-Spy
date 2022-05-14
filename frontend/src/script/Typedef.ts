@@ -241,7 +241,7 @@ export interface QueueSkill {
 	TotalGamesNeededForRating: number
 	TotalGamesNeededForLeaderboard: number
 	CurrentSeasonGamesNeededForRating: number
-	SeasonalInfoBySeasonID: SeasonalInfoMap
+	SeasonalInfoBySeasonID: SeasonalInfoMap | null
 }
 
 export interface SeasonalInfoMap {

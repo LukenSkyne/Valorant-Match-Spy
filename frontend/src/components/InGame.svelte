@@ -53,7 +53,7 @@
 				break
 			}
 
-			const seasonalInfoMap = playerMMR.QueueSkills?.competitive?.SeasonalInfoBySeasonID
+			const seasonalInfoMap = playerMMR.QueueSkills?.competitive?.SeasonalInfoBySeasonID ?? {}
 			const currentSeasonStats = seasonalInfoMap?.[currentSeasonID]
 			const rankNow = currentSeasonStats?.CompetitiveTier ?? 0
 			const rrNow = currentSeasonStats?.RankedRating ?? 0
