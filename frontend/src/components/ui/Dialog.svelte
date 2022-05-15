@@ -18,7 +18,7 @@
 </script>
 
 {#if show}
-	<main class="dialogContainer" transition:scale={{ duration: 200 }}>
+	<main data-no-drag class="dialogContainer" transition:scale={{ duration: 200 }}>
 		<div class="core">
 			<span class="text">
 				<span style="color: #42bd68">

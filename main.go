@@ -34,6 +34,7 @@ func main() {
 		Height:    768,
 		MinWidth:  1024,
 		MinHeight: 768,
+		Frameless: true,
 		Assets:    assets,
 		OnStartup: client.OnStartup,
 		Bind: []interface{}{

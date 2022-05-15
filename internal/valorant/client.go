@@ -65,6 +65,10 @@ func (c *Client) OnStartup(ctx context.Context) {
 	runtime.WindowSetTitle(ctx, "Valorant Match Spy v"+c.selfUpdater.GetCurrentVersion())
 }
 
+func (c *Client) GetCurrentVersion() string {
+	return c.selfUpdater.GetCurrentVersion()
+}
+
 func (c *Client) GetLatestVersion() *string {
 	if c.selfUpdater.CheckForUpdate() {
 		versionString := c.selfUpdater.GetLatestVersion()
