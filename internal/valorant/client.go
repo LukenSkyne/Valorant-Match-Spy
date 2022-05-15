@@ -75,10 +75,8 @@ func (c *Client) GetLatestVersion() *string {
 	return nil
 }
 
-func (c *Client) PerformSelfUpdate() {
-	if c.ctx != nil && c.selfUpdater.DoSelfUpdate() {
-		runtime.Quit(*c.ctx)
-	}
+func (c *Client) PerformSelfUpdate() bool {
+	return c.selfUpdater.DoSelfUpdate()
 }
 
 func (c *Client) Run() {

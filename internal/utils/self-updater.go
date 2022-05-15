@@ -8,12 +8,12 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"os/exec"
-	"strings"
+	"path/filepath"
+	"syscall"
 )
 
 const (
-	version         = "1.2.2"
+	version         = "1.2.3"
 	gitHubApiLatest = "https://api.github.com/repos/LukenSkyne/Valorant-Match-Spy/releases/latest"
 )
 
@@ -52,7 +52,7 @@ func (s *SelfUpdater) CheckForUpdate() bool {
 		return false
 	}
 
-	s.exePathTmp = strings.TrimSuffix(exePath, ".exe") + "_old.exe"
+	s.exePathTmp = filepath.Dir(exePath) + "\\." + filepath.Base(exePath) + ".old"
 
 	if err := os.Remove(s.exePathTmp); err != nil && !errors.Is(err, os.ErrNotExist) {
 		s.log.Error("Removing tmp exe failed: ", err)
@@ -108,15 +108,12 @@ func (s *SelfUpdater) DoSelfUpdate() bool {
 		return false
 	}
 
-	if err := downloadFile(s.exePath, *s.latestUrl); err != nil {
-		s.log.Error("Downloading exe failed: ", err)
-		return false
+	if err := hideFile(s.exePathTmp); err != nil {
+		s.log.Warn("Hiding file failed: ", err)
 	}
 
-	cmd := exec.Command(s.exePath)
-
-	if err := cmd.Start(); err != nil {
-		s.log.Fatal("Starting exe failed: ", err)
+	if err := downloadFile(s.exePath, *s.latestUrl); err != nil {
+		s.log.Error("Downloading exe failed: ", err)
 		return false
 	}
 
@@ -139,6 +136,24 @@ func downloadFile(fileName string, url string) error {
 	defer out.Close()
 
 	_, err = io.Copy(out, resp.Body)
+
+	return err
+}
+
+func hideFile(path string) error {
+	utf16PtrPath, err := syscall.UTF16PtrFromString(path)
+
+	if err != nil {
+		return err
+	}
+
+	attrs, err := syscall.GetFileAttributes(utf16PtrPath)
+
+	if err != nil {
+		return err
+	}
+
+	err = syscall.SetFileAttributes(utf16PtrPath, attrs|syscall.FILE_ATTRIBUTE_HIDDEN)
 
 	return err
 }
