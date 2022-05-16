@@ -20,6 +20,14 @@
 	$: playerCardImage = `https://media.valorant-api.com/playercards/${player.PlayerIdentity.PlayerCardID}/wideart.png`
 	$: partyStyle = player.PartyColor === null ? null : `background-color: ${player.PartyColor}`
 	$: playerLoadout = player.Loadout === null ? null : player.Loadout
+
+	function openLoadoutModal() {
+		if (playerLoadout === null) {
+			return
+		}
+
+		loadoutModalOpen = true
+	}
 </script>
 
 <div class="playerInfo">
@@ -34,7 +42,7 @@
 			</div>
 		{/if}
 		<div class="cardContainer">
-			<img alt src={playerCardImage} class="card" draggable="false" on:click={() => loadoutModalOpen = true}>
+			<img alt src={playerCardImage} class="card" class:cardButton={playerLoadout !== null} draggable="false" on:click={openLoadoutModal}>
 			{#if player.HighestTier !== null || player.CurrentTier !== null}
 				<RankInfo highestTier={player.HighestTier}
 						  currentTier={player.CurrentTier}
@@ -93,17 +101,19 @@
 
 	.card {
 		height: 100%;
-        cursor: pointer;
         user-select: none;
-
-		transition: filter 0.1s ease-out;
 	}
 
-    .card:hover {
+	.cardButton {
+        cursor: pointer;
+        transition: filter 0.1s ease-out;
+	}
+
+    .cardButton:hover {
 		filter: brightness(50%);
     }
 
-    .card:hover:active {
+    .cardButton:hover:active {
         filter: brightness(40%);
     }
 
