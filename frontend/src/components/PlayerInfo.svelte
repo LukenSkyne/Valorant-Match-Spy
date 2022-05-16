@@ -6,14 +6,20 @@
 	import { ClientID } from "../stores/ClientData"
 	//
 	import RankInfo from "./FloatingRankInfo.svelte"
+	import Loadout from "./Loadout.svelte"
+	import Button from "./ui/Button.svelte"
+	import Modal from "./ui/Modal.svelte"
 
 	export let player: Player
 	export let team: string
+
+	let loadoutModalOpen = false
 
 	$: dataTeam = $ClientID === player.Subject ? "self" : team
 	$: agentImage = `https://media.valorant-api.com/agents/${player.CharacterID}/displayicon.png`
 	$: playerCardImage = `https://media.valorant-api.com/playercards/${player.PlayerIdentity.PlayerCardID}/wideart.png`
 	$: partyStyle = player.PartyColor === null ? null : `background-color: ${player.PartyColor}`
+	$: playerLoadout = player.Loadout === null ? null : player.Loadout
 </script>
 
 <div class="playerInfo">
@@ -24,11 +30,11 @@
 			<div class="agent" data-team={dataTeam}>
 				<img alt
 					 src="https://media.valorant-api.com/agents/dade69b4-4f5a-8528-247b-219e5a1facd6/displayicon.png"
-					 style="filter: opacity(15%)" height="100%">
+					 style="filter: opacity(15%)" height="100%" draggable="false">
 			</div>
 		{/if}
-		<div class="card">
-			<img alt src={playerCardImage} height="100%">
+		<div class="cardContainer">
+			<img alt src={playerCardImage} class="card" draggable="false" on:click={() => loadoutModalOpen = true}>
 			{#if player.HighestTier !== null || player.CurrentTier !== null}
 				<RankInfo highestTier={player.HighestTier}
 						  currentTier={player.CurrentTier}
@@ -48,6 +54,9 @@
 	{#if partyStyle !== null}
 		<div class="party" style={partyStyle} in:fade={{duration: 200 }}></div>
 	{/if}
+	<Modal bind:show={loadoutModalOpen}>
+		<Loadout playerName={player.NameInfo.GameName} loadoutData={playerLoadout} />
+	</Modal>
 </div>
 
 <style>
@@ -82,7 +91,23 @@
         background-color: hsl(var(--yellow-darker) / 100%);
     }
 
-    .card {
+	.card {
+		height: 100%;
+        cursor: pointer;
+        user-select: none;
+
+		transition: filter 0.1s ease-out;
+	}
+
+    .card:hover {
+		filter: brightness(50%);
+    }
+
+    .card:hover:active {
+        filter: brightness(40%);
+    }
+
+    .cardContainer {
         position: relative;
 
         display: flex;
