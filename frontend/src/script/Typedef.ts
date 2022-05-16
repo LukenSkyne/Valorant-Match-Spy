@@ -13,6 +13,9 @@ export type GameMap =
 	"/Game/Maps/Port/Port" | // Icebox
 	"/Game/Maps/Foxtrot/Foxtrot" | // Breeze
 	"/Game/Maps/Canyon/Canyon" // Fracture
+export type GameMode =
+	"/Game/GameModes/Bomb/BombGameMode.BombGameMode_C" | // Competitive
+	string
 export type PartyAccessibility = "CLOSED" | "OPEN"
 export type MatchTeam = "Red" | "Blue"
 export type ProvisioningFlow = "Invalid" | "Matchmaking"
@@ -20,6 +23,7 @@ export type SessionLoopState = "MENUS" | "PREGAME" | "INGAME"
 export type PartyState = "DEFAULT" | "MATCHMAKING" | "MATCHMADE_GAME_STARTING" | "CUSTOM_GAME_SETUP"
 export type QueueID = "spikerush" | "competitive" | "unrated" | "deathmatch" | "onefa" | "ggteam"
 export type SeasonType = "act" | "episode"
+
 
 // interfaces for local
 
@@ -91,6 +95,7 @@ export interface PrivateData {
 	tournamentId: string
 }
 
+
 // interfaces for glz
 
 export interface PlayerData {
@@ -156,7 +161,7 @@ export interface PreGameMatch {
 	MapSelectStep: 0
 	Team1: MatchTeam
 	GamePodID: string // "aresriot.aws-rclusterprod-euc1-1.eu-gp-frankfurt-1"
-	Mode: string // "/Game/GameModes/Bomb/BombGameMode.BombGameMode_C"
+	Mode: GameMode
 	VoiceSessionID: string // "dc45c3c5-a6d1-4da4-8c88-30f4a094328d-tm1"
 	MUCName: string // "dc45c3c5-a6d1-4da4-8c88-30f4a094328d-1@ares-pregame.eu2.pvp.net"
 	QueueID: QueueID
@@ -183,7 +188,7 @@ export interface CoreGameMatch {
 	Version: number
 	State: "IN_PROGRESS"
 	MapID: GameMap
-	ModeID: string // "/Game/GameModes/Bomb/BombGameMode.BombGameMode_C"
+	ModeID: GameMode
 	ProvisioningFlow: ProvisioningFlow
 	GamePodID: string // "aresriot.aws-rclusterprod-euc1-1.eu-gp-frankfurt-1"
 	AllMUCName: string // "dc45c3c5-a6d1-4da4-8c88-30f4a094328d-all@ares-coregame.eu2.pvp.net"
@@ -205,6 +210,41 @@ export interface CoreGameMatch {
 		IsRanked: true
 	}
 }
+
+export interface SocketItem {
+	ID: string // uuid
+	TypeID: string // uuid
+}
+
+export interface Socket {
+	ID: string // uuid
+	Item: SocketItem
+}
+
+export interface SocketsMap {
+	[key: string]: Socket
+}
+
+export interface Item {
+	ID: string // uuid
+	TypeID: string // uuid
+	Sockets: SocketsMap
+}
+
+export interface ItemsMap {
+	[key: string]: Item
+}
+
+export interface PlayerLoadout {
+	Sprays: object // ignored for now
+	Items: ItemsMap
+}
+
+export interface CoreGameLoadout {
+	CharacterID: string // uuid
+	Loadout: PlayerLoadout
+}
+
 
 // interfaces for pd
 
@@ -281,6 +321,7 @@ export interface CompetitiveUpdate {
 	CompetitiveMovement: string // "MOVEMENT_UNKNOWN"
 	AFKPenalty: number
 }
+
 
 // interfaces for shared
 
