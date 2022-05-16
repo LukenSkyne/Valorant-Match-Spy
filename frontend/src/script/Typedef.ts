@@ -15,6 +15,7 @@ export type GameMap =
 	"/Game/Maps/Canyon/Canyon" // Fracture
 export type GameMode =
 	"/Game/GameModes/Bomb/BombGameMode.BombGameMode_C" | // Competitive
+	"/Game/GameModes/QuickBomb/QuickBombGameMode.QuickBombGameMode_C" | // Spike Rush
 	string
 export type PartyAccessibility = "CLOSED" | "OPEN"
 export type MatchTeam = "Red" | "Blue"
