@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	version         = "1.2.3"
+	version         = "1.3.0"
 	gitHubApiLatest = "https://api.github.com/repos/LukenSkyne/Valorant-Match-Spy/releases/latest"
 )
 
@@ -77,11 +77,10 @@ func (s *SelfUpdater) CheckForUpdate() bool {
 	json := string(bodyBytes)
 	latestTag := gjson.Get(json, "tag_name")
 	latestUrl := gjson.Get(json, "assets.0.browser_download_url")
-
 	latestVersion, err := semver.ParseTolerant(latestTag.Str)
 
 	if err != nil {
-		s.log.Fatal("CheckForUpdate ParseTolerant failed: ", err)
+		s.log.Error("CheckForUpdate ParseTolerant failed: ", err)
 		return false
 	}
 
