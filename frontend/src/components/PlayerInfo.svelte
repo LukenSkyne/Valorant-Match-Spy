@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { fade } from "svelte/transition"
 	//
-	import type { Player } from "./Typedef"
+	import type { Player } from "./InternalTypes"
 	//
 	import { ClientID } from "../stores/ClientData"
 	//
@@ -67,7 +67,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        color: #fff6
+        color: #fff6;
     }
 
     .agent[data-team="blue"] {

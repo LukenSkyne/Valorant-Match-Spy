@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { fade } from "svelte/transition"
 	//
-	import type { CompetitiveTier } from "./Typedef"
+	import type { CompetitiveTier } from "./InternalTypes"
 
 	export let highestTier: CompetitiveTier
 	export let currentTier: CompetitiveTier
@@ -53,6 +53,8 @@
 
 <style>
     .floatingRankInfo {
+        height: 100%;
+
         position: absolute;
         right: 0;
         padding: 4px;
@@ -73,6 +75,7 @@
 
         display: flex;
         flex-direction: row;
+		user-select: none;
 
         align-items: center;
         justify-content: flex-end;

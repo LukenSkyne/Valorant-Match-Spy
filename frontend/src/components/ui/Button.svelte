@@ -1,10 +1,9 @@
 <script lang="ts">
 	export let text: string
 	export let type: "default" | "disabled" | "success" | "warning" | "error" = "default"
-	export let callback: Function
 </script>
 
-<div class="btnContainer" on:click={callback}>
+<div class="btnContainer" on:click>
 	<div class="btn {type}">
 		{text}
 	</div>

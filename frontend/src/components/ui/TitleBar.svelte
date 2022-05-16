@@ -67,7 +67,7 @@
 	})
 </script>
 
-<div class="title-bar" on:mousedown={onMouseDown}>
+<div class="titleBar" on:mousedown={onMouseDown}>
 	<img class="logo" alt src={Logo}>
 	<span class="title">
 		{title}
@@ -112,7 +112,7 @@
 </div>
 
 <style>
-    .title-bar {
+    .titleBar {
         height: 28px;
 
         display: flex;
@@ -124,8 +124,8 @@
     }
 
     .logo {
-        height: 24px;
-        margin-left: 4px;
+        height: 16px;
+        margin-left: 6px;
     }
 
     .title {

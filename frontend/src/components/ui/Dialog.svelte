@@ -29,8 +29,8 @@
 				</span>
 			</span>
 			<div class="footer">
-				<Button text="Exit Now" type="error" callback={onConfirm} />
-				<Button text="Cancel" type="default" callback={onCancel} />
+				<Button text="Exit Now" type="error" on:click={onConfirm} />
+				<Button text="Cancel" type="default" on:click={onCancel} />
 			</div>
 		</div>
 	</main>
