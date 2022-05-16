@@ -1,8 +1,8 @@
 import { ValorantClient as ValorantClientReal } from "./ValorantClient"
 import type {
-	Content,
+	Content, CoreGameLoadout,
 	CoreGameMatch,
-	PlayerData,
+	PlayerData, PlayerLoadout,
 	PlayerMMR,
 	PlayerNameInfo,
 	PreGameMatch,
@@ -23,7 +23,7 @@ export class ValorantClient {
 	static async getPresences(): Promise<Presence[]> {
 		const imp = (await import(`./mockData/local_getPresences.json`)).default
 
-		return imp as unknown as Presence[]
+		return imp as Presence[]
 	}
 
 	static async getNames(playerUUIDs: string[]): Promise<PlayerNameInfo[]> {
@@ -36,9 +36,7 @@ export class ValorantClient {
 	}
 
 	static async getMMR(playerUUID: string): Promise<PlayerMMR> {
-		const imp = (await import(`./mockData/pd_getMMR_${playerUUID}.json`)).default
-
-		return imp as unknown as PlayerMMR
+		return (await import(`./mockData/pd_getMMR_${playerUUID}.json`)).default
 	}
 
 	static async getContent(): Promise<Content> {
@@ -72,9 +70,8 @@ export class ValorantClient {
 		return imp.default as unknown as PreGameMatch
 	}
 
-	static async getPreGameLoadouts(matchUUID: string) {
-		//const loadoutData = JSON.parse(await GetGlz(`/pregame/v1/matches/${matchUUID}/loadouts`))
-		//return loadoutData
+	static async getPreGameLoadouts(matchUUID: string): Promise<PlayerLoadout[]> {
+		return await import("./mockData/glz_getPreGameLoadouts.json")?.["Loadouts"]
 	}
 
 	/* CoreGame */
@@ -93,8 +90,7 @@ export class ValorantClient {
 		return imp.default as CoreGameMatch
 	}
 
-	static async getCoreGameLoadouts(matchUUID: string) {
-		//const loadoutData = JSON.parse(await GetGlz(`/core-game/v1/matches/${matchUUID}/loadouts`))
-		//return loadoutData
+	static async getCoreGameLoadouts(matchUUID: string): Promise<CoreGameLoadout[]> {
+		return (await import("./mockData/glz_getCoreGameLoadouts.json"))?.["Loadouts"]
 	}
 }
