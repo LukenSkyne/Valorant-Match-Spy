@@ -1,9 +1,11 @@
-import { GetGlz, GetLocal, GetPd, PutPd, GetShared, SelfID } from "../../wailsjs/go/valorant/Client.js"
+import { GetGlz, GetLocal, GetPd, GetShared, PutPd, SelfID } from "../../wailsjs/go/valorant/Client.js"
 
 import type {
 	Content,
+	CoreGameLoadout,
 	CoreGameMatch,
 	PlayerData,
+	PlayerLoadout,
 	PlayerMMR,
 	PlayerNameInfo,
 	PreGameMatch,
@@ -64,12 +66,8 @@ export class ValorantClient {
 		return JSON.parse(await GetGlz(`/pregame/v1/matches/${matchUUID}`))
 	}
 
-	static async getPreGameLoadouts(matchUUID: string) {
-		const loadoutData = JSON.parse(await GetGlz(`/pregame/v1/matches/${matchUUID}/loadouts`))
-
-		//SaveLog("glz_getPreGameLoadouts", JSON.stringify(loadoutData, null, "\t"))
-
-		return loadoutData
+	static async getPreGameLoadouts(matchUUID: string): Promise<PlayerLoadout[]> {
+		return JSON.parse(await GetGlz(`/pregame/v1/matches/${matchUUID}/loadouts`))?.["Loadouts"]
 	}
 
 	/* CoreGame */
@@ -82,11 +80,7 @@ export class ValorantClient {
 		return JSON.parse(await GetGlz(`/core-game/v1/matches/${matchUUID}`))
 	}
 
-	static async getCoreGameLoadouts(matchUUID: string) {
-		const loadoutData = JSON.parse(await GetGlz(`/core-game/v1/matches/${matchUUID}/loadouts`))
-
-		//SaveLog("glz_getCoreGameLoadouts", JSON.stringify(loadoutData, null, "\t"))
-
-		return loadoutData
+	static async getCoreGameLoadouts(matchUUID: string): Promise<CoreGameLoadout[]> {
+		return JSON.parse(await GetGlz(`/core-game/v1/matches/${matchUUID}/loadouts`))?.["Loadouts"]
 	}
 }
