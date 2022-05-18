@@ -1,19 +1,19 @@
 <script lang="ts">
 	import { fade } from "svelte/transition"
 	//
-	import type { Player } from "./InternalTypes"
+	import type { Player, PlayerSkin } from "./InternalTypes"
 	//
 	import { ClientID } from "../stores/ClientData"
 	//
 	import RankInfo from "./FloatingRankInfo.svelte"
 	import Loadout from "./Loadout.svelte"
-	import Button from "./ui/Button.svelte"
 	import Modal from "./ui/Modal.svelte"
 
 	export let player: Player
 	export let team: string
 
 	let loadoutModalOpen = false
+	let loadoutHover = false
 
 	$: dataTeam = $ClientID === player.Subject ? "self" : team
 	$: agentImage = `https://media.valorant-api.com/agents/${player.CharacterID}/displayicon.png`
@@ -21,12 +21,40 @@
 	$: partyStyle = player.PartyColor === null ? null : `background-color: ${player.PartyColor}`
 	$: playerLoadout = player.Loadout === null ? null : player.Loadout
 
+	const contentTierOrder = [
+		"12683d76-48d7-84a3-4e09-6985794f0445", // Select
+		"0cebb8be-46d7-c12a-d306-e9907bfc5a25", // Deluxe
+		"60bca009-4182-7998-dee7-b8a2558dc369", // Premium
+		"411e4a55-4e59-7757-41f0-86a53f101bb5", // Ultra
+		"e046854e-406c-37f4-6607-19a9ba8426fc", // Exclusive
+	]
+	let contentTiers = {}
+
+	$: if (playerLoadout !== null) {
+		contentTiers = {}
+
+		for (const playerSkin: PlayerSkin of playerLoadout) {
+			if (playerSkin.skin.contentTierUuid !== null) {
+				contentTiers[playerSkin.skin.contentTierUuid] ??= 0
+				contentTiers[playerSkin.skin.contentTierUuid]++
+			}
+		}
+	}
+
 	function openLoadoutModal() {
 		if (playerLoadout === null) {
 			return
 		}
 
 		loadoutModalOpen = true
+	}
+
+	function onMouseEnter() {
+		loadoutHover = true
+	}
+
+	function onMouseLeave() {
+		loadoutHover = false
 	}
 </script>
 
@@ -42,7 +70,25 @@
 			</div>
 		{/if}
 		<div class="cardContainer">
-			<img alt src={playerCardImage} class="card" class:cardButton={playerLoadout !== null} draggable="false" on:click={openLoadoutModal}>
+			<img alt src={playerCardImage} class="card" draggable="false"
+				 class:cardButton={playerLoadout !== null}
+				 on:click={openLoadoutModal}
+				 on:mouseenter={onMouseEnter}
+				 on:mouseleave={onMouseLeave}
+			>
+			{#if loadoutHover && Object.keys(contentTiers).length > 0}
+				<div class="contentTierList" transition:fade={{ duration: 100 }}>
+					{#each contentTierOrder as ctID}
+						{#if contentTiers[ctID] !== undefined}
+							<img alt class="contentTierImage" src={`https://media.valorant-api.com/contenttiers/${ctID}/displayicon.png`}>
+							<div class="contentTier">
+								{contentTiers[ctID]}
+							</div>
+						{/if}
+					{/each}
+				</div>
+			{/if}
+
 			{#if player.HighestTier !== null || player.CurrentTier !== null}
 				<RankInfo highestTier={player.HighestTier}
 						  currentTier={player.CurrentTier}
@@ -68,6 +114,35 @@
 </div>
 
 <style>
+	.contentTierList {
+		pointer-events: none;
+		user-select: none;
+
+		position: absolute;
+        left: 16px;
+        top: 50%;
+
+		transform: translateY(-50%);
+
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		padding: 0 8px 0 6px;
+
+		height: 24px;
+		background-color: #0007;
+
+		border-radius: 100px;
+	}
+
+	.contentTierImage {
+		height: 16px;
+	}
+
+	.contentTier {
+        font-size: 14px;
+	}
+
 	.playerInfo {
         position: relative;
 	}

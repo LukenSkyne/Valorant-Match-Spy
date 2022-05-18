@@ -25,7 +25,7 @@
         font-size: 16px;
 
         border: none;
-        border-radius: 2px;
+        border-radius: 3px;
 
         background-color: var(--col);
 

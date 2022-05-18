@@ -35,7 +35,7 @@
 		position: fixed;
 		transform: translate(0%, -50%);
 
-        border-radius: 6px;
+        border-radius: 3px;
         padding: 2px 5px;
 		user-select: none;
 
