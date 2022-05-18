@@ -41,6 +41,7 @@
 		position: fixed;
 		display: grid;
 		place-items: center;
+        z-index: 1337;
 
 		left: 0;
 		top: 0;
