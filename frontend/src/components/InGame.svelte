@@ -7,6 +7,7 @@
 	import type { CompetitiveTier, Player, PlayerSkin, Skin } from "./InternalTypes"
 	//
 	import { ClientID, ClientState, Presences } from "../stores/ClientData"
+	import { AllBuddies, AllCompetitiveTiers, AllSkins } from "../stores/ValorantAPI"
 	//
 	import PlayerInfo from "./PlayerInfo.svelte"
 	import DecorationTop from "../assets/images/DecorationTop.svelte"
@@ -21,9 +22,6 @@
 	let players: Player[] = []
 	let currentSeasonID: string = null
 	let backgroundUrl: string = null
-	//
-	let tierList: CompetitiveTier[] = []
-	let skinList: Skin[] = []
 
 	$: allies = players.filter((p) => p.TeamID === clientTeamID)
 	$: enemies = players.filter((p) => p.TeamID !== clientTeamID)
@@ -110,7 +108,7 @@
 				const buddyID = item.Sockets[typeToSocketID.buddyID]?.Item.ID
 
 				playerSkins.push({
-					skin: skinList.find((skin) => skin.uuid === skinID),
+					skin: $AllSkins.find((skin) => skin.uuid === skinID),
 					skinChromaID,
 					buddyID,
 				})
@@ -161,9 +159,9 @@
 			const highestRank = allValidRanks.length > 0 ? Math.max(...allValidRanks) : null
 			const lowestRank = allValidRanks.length > 0 ? Math.min(...allValidRanks) : null
 
-			player.HighestTier = tierList[highestRank] ?? null
-			player.CurrentTier = tierList[rankNow]
-			player.LowestTier = tierList[lowestRank] ?? null
+			player.HighestTier = $AllCompetitiveTiers[highestRank] ?? null
+			player.CurrentTier = $AllCompetitiveTiers[rankNow]
+			player.LowestTier = $AllCompetitiveTiers[lowestRank] ?? null
 			player.CurrentRankedRating = rrNow
 
 			players = players // explicit update
@@ -251,17 +249,26 @@
 	}
 
 	onMount(async () => {
-		const tiersJson = await (await fetch("https://valorant-api.com/v1/competitivetiers")).json()
-		tierList = tiersJson?.data?.at(-1)?.["tiers"]
+		if ($AllCompetitiveTiers === null) {
+			const tiersJson = await (await fetch("https://valorant-api.com/v1/competitivetiers")).json()
+			const tierList = tiersJson?.data?.at(-1)?.["tiers"]
 
-		tierList = tierList?.map((t) => {
-			t.tierName = t.tierName.charAt(0) + t.tierName.slice(1).toLowerCase()
+			$AllCompetitiveTiers = tierList?.map((t) => {
+				t.tierName = t.tierName.charAt(0) + t.tierName.slice(1).toLowerCase()
 
-			return t
-		})
+				return t
+			})
+		}
 
-		const skinsJson = await (await fetch("https://valorant-api.com/v1/weapons/skins")).json()
-		skinList = skinsJson?.data
+		if ($AllSkins === null) {
+			const skinsJson = await (await fetch("https://valorant-api.com/v1/weapons/skins")).json()
+			$AllSkins = skinsJson?.data
+		}
+
+		if ($AllBuddies === null) {
+			const buddiesJson = await (await fetch("https://valorant-api.com/v1/buddies")).json()
+			$AllBuddies = buddiesJson?.data
+		}
 
 		const content = await ValorantClient.getContent()
 		const currentSeason = content.Seasons.find((season) => season.IsActive && season.Type === "act")

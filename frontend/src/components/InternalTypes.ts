@@ -37,6 +37,24 @@ export interface CompetitiveTier {
 	rankTriangleUpIcon: string | null
 }
 
+export interface Buddy {
+	uuid: string // "dce731f8-4560-5f30-6eb5-8ab2e36864ec"
+	displayName: string // "RGX 11z Pro Buddy"
+	isHiddenIfNotOwned: false
+	themeUuid: null
+	displayIcon: string // "https://media.valorant-api.com/buddies/dce731f8-4560-5f30-6eb5-8ab2e36864ec/displayicon.png"
+	assetPath: string // "ShooterGame/Content/Equippables/Buddies/Afterglow/GunBuddy_Afterglow_PrimaryAsset"
+	levels: [
+		/*{
+			"uuid": "a3043ec2-4a5b-ca46-d8f6-0399f1e52565",
+			"charmLevel": 1,
+			"displayName": "Afterglow",
+			"displayIcon": "https://media.valorant-api.com/buddylevels/a3043ec2-4a5b-ca46-d8f6-0399f1e52565/displayicon.png",
+			"assetPath": "ShooterGame/Content/Equippables/Buddies/Afterglow/GunBuddy_Afterglow_Lv1_PrimaryAsset"
+		}*/
+	]
+}
+
 export interface Skin {
 	uuid: string // "97af88e4-4176-9fa3-4a26-57919443dab7"
 	displayName: string // "Glitchpop Odin"
