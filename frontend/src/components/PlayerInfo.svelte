@@ -13,7 +13,6 @@
 	export let team: string
 
 	let loadoutModalOpen = false
-	let loadoutHover = false
 
 	$: dataTeam = $ClientID === player.Subject ? "self" : team
 	$: agentImage = `https://media.valorant-api.com/agents/${player.CharacterID}/displayicon.png`
@@ -48,14 +47,6 @@
 
 		loadoutModalOpen = true
 	}
-
-	function onMouseEnter() {
-		loadoutHover = true
-	}
-
-	function onMouseLeave() {
-		loadoutHover = false
-	}
 </script>
 
 <div class="playerInfo">
@@ -73,11 +64,9 @@
 			<img alt src={playerCardImage} class="card" draggable="false"
 				 class:cardButton={playerLoadout !== null}
 				 on:click={openLoadoutModal}
-				 on:mouseenter={onMouseEnter}
-				 on:mouseleave={onMouseLeave}
 			>
-			{#if loadoutHover && Object.keys(contentTiers).length > 0}
-				<div class="contentTierList" transition:fade={{ duration: 100 }}>
+			{#if Object.keys(contentTiers).length > 0}
+				<div class="contentTierList">
 					{#each contentTierOrder as ctID}
 						{#if contentTiers[ctID] !== undefined}
 							<img alt class="contentTierImage" src={`https://media.valorant-api.com/contenttiers/${ctID}/displayicon.png`}>
@@ -114,35 +103,6 @@
 </div>
 
 <style>
-	.contentTierList {
-		pointer-events: none;
-		user-select: none;
-
-		position: absolute;
-        left: 16px;
-        top: 50%;
-
-		transform: translateY(-50%);
-
-		display: flex;
-		align-items: center;
-		gap: 4px;
-		padding: 0 8px 0 6px;
-
-		height: 24px;
-		background-color: #0007;
-
-		border-radius: 100px;
-	}
-
-	.contentTierImage {
-		height: 16px;
-	}
-
-	.contentTier {
-        font-size: 14px;
-	}
-
 	.playerInfo {
         position: relative;
 	}
@@ -190,6 +150,41 @@
 
     .cardButton:hover:active {
         filter: brightness(40%);
+    }
+
+    .cardButton:hover + .contentTierList {
+        opacity: 1;
+    }
+
+    .contentTierList {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        height: 24px;
+        padding: 0 8px 0 6px;
+        border-radius: 100px;
+
+        background-color: #0007;
+        opacity: 0;
+
+        pointer-events: none;
+        user-select: none;
+
+        transition: opacity 0.1s ease-out;
+        transform: translateY(-50%);
+    }
+
+    .contentTierImage {
+        height: 16px;
+    }
+
+    .contentTier {
+        font-size: 14px;
     }
 
     .cardContainer {
