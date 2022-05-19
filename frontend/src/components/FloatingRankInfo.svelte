@@ -18,18 +18,19 @@
 		"RADIANT": "fff0a0",
 	}
 
-	$: highestTierStyle = `color: #${colorMap[highestTier?.divisionName] ?? highestTier?.color ?? "fff"}`
-	$: currentTierStyle = `color: #${colorMap[currentTier?.divisionName] ?? currentTier?.color ?? "fff"}`
-
 	let showInfo = false
 	let introState = false
 	let outroState = false
+
+	$: highestTierStyle = `color: #${colorMap[highestTier?.divisionName] ?? highestTier?.color ?? "fff"}`
+	$: currentTierStyle = `color: #${colorMap[currentTier?.divisionName] ?? currentTier?.color ?? "fff"}`
+	$: hoverRankInfo = (showInfo === false && introState === false) || outroState === true
 </script>
 
 <div class="floatingRankInfo" in:fade={{duration: 100 }} on:mouseenter={() => showInfo = true} on:mouseleave={() => showInfo = false}>
 	{#if highestTier !== null && highestTier?.tier !== currentTier?.tier}
 		<div class="rankInfo">
-			{#if (showInfo === false && introState === false) || outroState === true}
+			{#if hoverRankInfo}
 				<span transition:fly={{ y: 16, duration: 200 }} class="rankText" style={highestTierStyle}
 				>
 					{highestTier.tierName}
@@ -45,7 +46,7 @@
 	{/if}
 	{#if currentTier !== null}
 		<div class="rankInfo">
-			{#if (showInfo === false && introState === false) || outroState === true}
+			{#if hoverRankInfo}
 				<span transition:fly={{ y: 16, duration: 200 }} class="rankText" style={currentTierStyle}>
 					{currentTier.tierName}
 				</span>

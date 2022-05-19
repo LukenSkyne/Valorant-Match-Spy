@@ -3,22 +3,22 @@
 
 export function GetLatestVersion():Promise<any>;
 
-export function GetLocal(arg1:string):Promise<any>;
-
-export function GetShared(arg1:string):Promise<any>;
+export function PerformSelfUpdate():Promise<boolean>;
 
 export function PutPd(arg1:string,arg2:string):Promise<any>;
+
+export function SelfID():Promise<any>;
+
+export function Run():void;
+
+export function Stop():void;
 
 export function GetCurrentVersion():Promise<string>;
 
 export function GetGlz(arg1:string):Promise<any>;
 
-export function Run():void;
-
-export function SelfID():Promise<any>;
-
-export function Stop():void;
+export function GetLocal(arg1:string):Promise<any>;
 
 export function GetPd(arg1:string):Promise<any>;
 
-export function PerformSelfUpdate():Promise<boolean>;
+export function GetShared(arg1:string):Promise<any>;
