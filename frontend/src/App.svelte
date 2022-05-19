@@ -7,9 +7,9 @@
 	//
 	import { ClientID, ClientState, Presences } from "./stores/ClientData"
 	//
-	import Logo from "./assets/images/vms-logo.png"
 	import TitleBar from "./components/ui/TitleBar.svelte"
 	import InGame from "./components/InGame.svelte"
+	import Menus from "./components/Menus.svelte"
 
 	async function syncWithClient() {
 		const selfID = await ValorantClient.getSelfID()
@@ -118,13 +118,8 @@
 
 <TitleBar />
 <div class="container">
-	{#if $ClientState === null || $ClientState === "MENUS"}
-		<img height="25%" alt src={Logo}>
-		{#if $ClientState === null}
-			<span>Waiting for Valorant to Start...</span>
-		{:else}
-			<span>Waiting for Match...</span>
-		{/if}
+	{#if ($ClientState === null || $ClientState === "MENUS")}
+		<Menus />
 	{:else if ($ClientState === "INGAME" || $ClientState === "PREGAME")}
 		<InGame />
 	{/if}

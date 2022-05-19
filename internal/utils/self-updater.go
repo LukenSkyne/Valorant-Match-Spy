@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	version         = "1.4.1"
+	version         = "1.4.2"
 	gitHubApiLatest = "https://api.github.com/repos/LukenSkyne/Valorant-Match-Spy/releases/latest"
 )
 

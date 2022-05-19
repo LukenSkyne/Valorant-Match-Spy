@@ -2,7 +2,6 @@
 	import { onDestroy } from "svelte"
 	import { scale } from "svelte/transition"
 	//
-	import Loadout from "../Loadout.svelte"
 	import Button from "./Button.svelte"
 
 	export let show: boolean

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onDestroy, onMount } from "svelte"
+	import { fade } from "svelte/transition"
 	import type { Unsubscriber } from "svelte/store"
 	//
 	import { ValorantClient } from "../script/ValorantClient"
@@ -29,9 +30,9 @@
 
 	function assignPartyColors() {
 		const colorPalette = [
-			"#7adfbc",
-			"#6fc8ff",
-			"#b36edc",
+			"#7ADFBC",
+			"#6FC8FF",
+			"#B36EDC",
 			"#FF6F91",
 			"#FF9671",
 			"#FFC75F",
@@ -54,10 +55,11 @@
 			const partyID = presence.private.partyId
 			parties[partyID] ??= colorPalette[colorIndex++]
 
-			player.PartyColor = parties[partyID]
+			if (player.PartyColor !== parties[partyID]) {
+				player.PartyColor = parties[partyID]
+				players = players // explicit update
+			}
 		}
-
-		players = players // explicit update
 	}
 
 	function processLoadouts(loadouts: PlayerLoadout[]) {
@@ -289,7 +291,7 @@
 	})
 </script>
 
-<main class="gameContainer" style={gameContainerStyle}>
+<main transition:fade={{ duration: 200 }} class="gameContainer" style={gameContainerStyle}>
 	<!-- ALLIES -->
 	{#if allies.length > 0}
 		<div class="teamContainer">
@@ -347,6 +349,11 @@
     }
 
     .gameContainer {
+        z-index: 100;
+		position: absolute;
+        left: 0;
+		top: 0;
+
         width: 100%;
         height: 100%;
         color: white;
