@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fade } from "svelte/transition"
+	import { fade, fly } from "svelte/transition"
 	//
 	import type { CompetitiveTier } from "./InternalTypes"
 
@@ -22,30 +22,44 @@
 	$: currentTierStyle = `color: #${colorMap[currentTier?.divisionName] ?? currentTier?.color ?? "fff"}`
 
 	let showInfo = false
-
-	function onMouseEnter() {
-		showInfo = true
-	}
-
-	function onMouseLeave() {
-		showInfo = false
-	}
+	let introState = false
+	let outroState = false
 </script>
 
-<div class="floatingRankInfo" in:fade={{duration: 200 }} on:mouseenter={onMouseEnter} on:mouseleave={onMouseLeave}>
+<div class="floatingRankInfo" in:fade={{duration: 100 }} on:mouseenter={() => showInfo = true} on:mouseleave={() => showInfo = false}>
 	{#if highestTier !== null && highestTier?.tier !== currentTier?.tier}
 		<div class="rankInfo">
-			<span class="rankText" style={highestTierStyle}>
-				{showInfo ? "Highest Rank" : highestTier.tierName}
-			</span>
+			{#if (showInfo === false && introState === false) || outroState === true}
+				<span transition:fly={{ y: 16, duration: 200 }} class="rankText" style={highestTierStyle}
+				>
+					{highestTier.tierName}
+				</span>
+			{:else}
+				<span transition:fly={{ y: -16, duration: 200 }} class="rankText" style={highestTierStyle}
+				>
+					Highest Rank
+				</span>
+			{/if}
 			<img alt src={highestTier.smallIcon} height="100%">
 		</div>
 	{/if}
 	{#if currentTier !== null}
 		<div class="rankInfo">
-			<span class="rankText" style={currentTierStyle}>
-				{showInfo ? "Current Rank" : currentTier.tierName}
-			</span>
+			{#if (showInfo === false && introState === false) || outroState === true}
+				<span transition:fly={{ y: 16, duration: 200 }} class="rankText" style={currentTierStyle}>
+					{currentTier.tierName}
+				</span>
+			{:else}
+				<span transition:fly={{ y: -16, duration: 200 }} class="rankText" style={currentTierStyle}
+					  on:introstart={() => introState = true}
+					  on:introend={() => introState = false}
+					  on:outrostart={() => outroState = true}
+					  on:outroend={() => outroState = false}
+				>
+					Current Rank
+				</span>
+			{/if}
+
 			<img alt src={currentTier.smallIcon} height="100%">
 		</div>
 	{/if}
@@ -53,6 +67,7 @@
 
 <style>
     .floatingRankInfo {
+		width: 30%;
         height: 100%;
 
         position: absolute;
@@ -82,12 +97,17 @@
         gap: 4px;
     }
 
-    .rankText {
+	.rankText {
+		position: absolute;
+		right: 36px;
+
         padding: 2px 6px;
         font-size: 13px;
+        white-space: nowrap;
 
-        background-color: #0007;
+        pointer-events: none;
         border-radius: 100px;
-		backdrop-filter: blur(2px);
-    }
+        background-color: #0007;
+        backdrop-filter: blur(2px);
+	}
 </style>
