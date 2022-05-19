@@ -51,7 +51,7 @@
 
 <div class="playerInfo">
 	<div class="playerTop">
-		{#if player.CharacterID !== null}
+		{#if player.CharacterID !== null && player.CharacterID !== ""}
 			<img alt src={agentImage} class="agent" data-team={dataTeam}>
 		{:else}
 			<div class="agent" data-team={dataTeam}>
