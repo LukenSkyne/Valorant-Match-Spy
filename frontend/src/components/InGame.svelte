@@ -49,6 +49,7 @@
 				presence.private.partyId === null ||
 				presence.private.partyId === "" ||
 				presence.private.partySize < 2) {
+				player.PartyColor = null
 				continue
 			}
 
@@ -209,7 +210,7 @@
 
 			updateBackground(coreGameMatchData.MapID).catch(console.error)
 			clientTeamID = coreGameMatchData.Players.find((player) => player.Subject === $ClientID)?.TeamID
-
+			
 			players = coreGameMatchData.Players.map(player => ({
 				Subject: player.Subject,
 				TeamID: player.TeamID,
