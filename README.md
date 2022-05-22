@@ -33,9 +33,17 @@ which runs a [Go](https://go.dev/) application with a [Svelte](https://svelte.de
   * while in agent select, the app will display details about your Allies
   * while in-game, the app will display details about every Player
 
-Note that the following screenshot depicts how the app recreates a loading screen style overview of the players.
+The following screenshot shows the app visualizing a loading screen style overview of the players:
 
-<img src="assets/screenshot-ingame.png" alt="Logo">
+<img src="assets/screenshot-ingame.png" alt="In-Game">
+
+Hovering over a playercard shows details about a players loadout:
+
+<img src="assets/screenshot-playercard-hover.png" alt="Playercard Hover">
+
+Clicking on the playercard brings up the loadout of the respective player:
+
+<img src="assets/screenshot-loadout.png" alt="Loadout">
 
 ## Development & Compiling yourself
 
