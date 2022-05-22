@@ -122,6 +122,8 @@
 		for (let i = 0; i < players.length; i++) {
 			players[i].Loadout = playerLoadouts[i]
 		}
+
+		players = players // explicit update
 	}
 
 	async function updateBackground(mapID) {
@@ -179,24 +181,21 @@
 			updateBackground(preGameMatchData.MapID).catch(console.error)
 			clientTeamID = preGameMatchData.AllyTeam.TeamID
 
-			for (const ally of preGameMatchData.AllyTeam.Players) {
-				players.push({
-					Subject: ally.Subject,
-					TeamID: clientTeamID,
-					NameInfo: playerNames.find((playerName) => playerName.Subject === ally.Subject),
-					PlayerIdentity: ally.PlayerIdentity,
-					SeasonalBadgeInfo: ally.SeasonalBadgeInfo,
-					CharacterID: null,
-					HighestTier: null,
-					CurrentTier: null,
-					LowestTier: null,
-					CurrentRankedRating: null,
-					PartyColor: null,
-					Loadout: null,
-				})
-			}
+			players = preGameMatchData.AllyTeam.Players.map((ally) => ({
+				Subject: ally.Subject,
+				TeamID: clientTeamID,
+				NameInfo: playerNames.find((playerName) => playerName.Subject === ally.Subject),
+				PlayerIdentity: ally.PlayerIdentity,
+				SeasonalBadgeInfo: ally.SeasonalBadgeInfo,
+				CharacterID: null,
+				HighestTier: null,
+				CurrentTier: null,
+				LowestTier: null,
+				CurrentRankedRating: null,
+				PartyColor: null,
+				Loadout: null,
+			}))
 
-			players = players // explicit update
 			assignPartyColors()
 			await fetchRanks()
 
@@ -211,30 +210,20 @@
 			updateBackground(coreGameMatchData.MapID).catch(console.error)
 			clientTeamID = coreGameMatchData.Players.find((player) => player.Subject === $ClientID)?.TeamID
 
-			for (const player of coreGameMatchData.Players) {
-				const newPlayerObj: Player = {
-					Subject: player.Subject,
-					TeamID: player.TeamID,
-					NameInfo: playerNames.find((playerName) => playerName.Subject === player.Subject),
-					PlayerIdentity: player.PlayerIdentity,
-					SeasonalBadgeInfo: player.SeasonalBadgeInfo,
-					CharacterID: player.CharacterID,
-					HighestTier: null,
-					CurrentTier: null,
-					LowestTier: null,
-					CurrentRankedRating: null,
-					PartyColor: null,
-					Loadout: null,
-				}
-
-				const playerIndex = players.findIndex((p) => p.Subject === newPlayerObj.Subject)
-
-				if (playerIndex !== -1) {
-					players.splice(playerIndex, 1, newPlayerObj)
-				} else {
-					players.push(newPlayerObj)
-				}
-			}
+			players = coreGameMatchData.Players.map(player => ({
+				Subject: player.Subject,
+				TeamID: player.TeamID,
+				NameInfo: playerNames.find((playerName) => playerName.Subject === player.Subject),
+				PlayerIdentity: player.PlayerIdentity,
+				SeasonalBadgeInfo: player.SeasonalBadgeInfo,
+				CharacterID: player.CharacterID,
+				HighestTier: null,
+				CurrentTier: null,
+				LowestTier: null,
+				CurrentRankedRating: null,
+				PartyColor: null,
+				Loadout: null,
+			}))
 
 			const coreGameLoadouts = await ValorantClient.getCoreGameLoadouts(playerData.MatchID)
 
@@ -242,7 +231,6 @@
 				processLoadouts(coreGameLoadouts.map((c) => c.Loadout))
 			}
 
-			players = players // explicit update
 			assignPartyColors()
 			await fetchRanks()
 

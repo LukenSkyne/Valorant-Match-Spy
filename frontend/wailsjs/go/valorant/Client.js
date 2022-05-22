@@ -6,24 +6,24 @@ export function GetCurrentVersion() {
   return window['go']['valorant']['Client']['GetCurrentVersion']();
 }
 
-export function GetPd(arg1) {
-  return window['go']['valorant']['Client']['GetPd'](arg1);
+export function GetGlz(arg1) {
+  return window['go']['valorant']['Client']['GetGlz'](arg1);
 }
 
-export function GetShared(arg1) {
-  return window['go']['valorant']['Client']['GetShared'](arg1);
+export function GetPd(arg1) {
+  return window['go']['valorant']['Client']['GetPd'](arg1);
 }
 
 export function PutPd(arg1, arg2) {
   return window['go']['valorant']['Client']['PutPd'](arg1, arg2);
 }
 
-export function Stop() {
-  window['go']['valorant']['Client']['Stop']();
+export function Run() {
+  window['go']['valorant']['Client']['Run']();
 }
 
-export function GetGlz(arg1) {
-  return window['go']['valorant']['Client']['GetGlz'](arg1);
+export function SelfID() {
+  return window['go']['valorant']['Client']['SelfID']();
 }
 
 export function GetLatestVersion() {
@@ -34,14 +34,14 @@ export function GetLocal(arg1) {
   return window['go']['valorant']['Client']['GetLocal'](arg1);
 }
 
+export function GetShared(arg1) {
+  return window['go']['valorant']['Client']['GetShared'](arg1);
+}
+
 export function PerformSelfUpdate() {
   return window['go']['valorant']['Client']['PerformSelfUpdate']();
 }
 
-export function Run() {
-  window['go']['valorant']['Client']['Run']();
-}
-
-export function SelfID() {
-  return window['go']['valorant']['Client']['SelfID']();
+export function Stop() {
+  window['go']['valorant']['Client']['Stop']();
 }
