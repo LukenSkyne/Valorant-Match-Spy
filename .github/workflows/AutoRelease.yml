@@ -7,10 +7,10 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+"
 
 jobs:
-  # build the project required for release
-  build:
-    name: Build
-    runs-on: windows-latest
+  # build a binary & create a new release
+  release:
+    name: Build & Release
+    runs-on: ubuntu-latest # actual target platform is set through compiler flag
     
     strategy:
       matrix:
@@ -20,6 +20,10 @@ jobs:
     #######
     - name: Checking out repository
       uses: actions/checkout@v3
+    
+    #######
+    - name: Extracting version from references
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
     
     #######
     - name: Set up Go
@@ -41,39 +45,7 @@ jobs:
     
     #######
     - name: Build Wails app
-      run: wails build
-    
-    #######
-    - name: Move Binary to main folder
-      run: move ".\build\bin\Valorant Match Spy.exe" ".\Valorant-Match-Spy.exe"
-    
-    #######
-    - name: Uploading Valorant-Match-Spy to Artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: Valorant-Match-Spy
-        path: Valorant-Match-Spy.exe
-  
-  # create a new release with the built binary
-  release:
-    name: Release
-    needs: build
-    runs-on: ubuntu-latest
-    
-    steps:
-    #######
-    - name: Checking out repository
-      uses: actions/checkout@v2
-    
-    #######
-    - name: Extracting version from references
-      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
-    
-    #######
-    - name: Downloading Valorant-Match-Spy from Artifacts
-      uses: actions/download-artifact@v2
-      with:
-        name: Valorant-Match-Spy
+      run: wails build -platform "windows/amd64" -ldflags="-X 'match-spy/internal/utils.version=${{ env.VERSION }}'" -o "Valorant-Match-Spy.exe"
     
     #######
     - name: Create Release
@@ -94,6 +66,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ./Valorant-Match-Spy.exe
+        asset_path: "./build/bin/Valorant-Match-Spy.exe"
         asset_name: Valorant-Match-Spy.exe
         asset_content_type: application/exe

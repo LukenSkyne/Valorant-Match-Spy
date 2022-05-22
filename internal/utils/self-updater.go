@@ -12,8 +12,8 @@ import (
 	"syscall"
 )
 
-const (
-	version         = "1.4.3"
+var (
+	version         = "0.0.0-dev"
 	gitHubApiLatest = "https://api.github.com/repos/LukenSkyne/Valorant-Match-Spy/releases/latest"
 )
 
