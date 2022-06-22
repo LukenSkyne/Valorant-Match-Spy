@@ -67,8 +67,8 @@ github.com/valyala/fasttemplate v1.2.1 h1:TVEnxayobAdVkhQfrfes2IzOB6o+z4roRkPF52
 github.com/valyala/fasttemplate v1.2.1/go.mod h1:KHLXt3tVN2HBp8eijSv/kGJopbvo7S+qRAEEKiv+SiQ=
 github.com/wailsapp/mimetype v1.4.1 h1:pQN9ycO7uo4vsUUuPeHEYoUkLVkaRntMnHJxVwYhwHs=
 github.com/wailsapp/mimetype v1.4.1/go.mod h1:9aV5k31bBOv5z6u+QP8TltzvNGJPmNJD4XlAL3U+j3o=
-github.com/wailsapp/wails/v2 v2.0.0-beta.36 h1:Hz4KjdATFVvTGG2BYpye91PZy62JZfBLAkQwJKQzzRA=
-github.com/wailsapp/wails/v2 v2.0.0-beta.36/go.mod h1:dPVZfCu+SSg6HddAATME5Wj1ObXhSGIYDS7K88P383c=
+github.com/wailsapp/wails/v2 v2.0.0-beta.37 h1:LQpw4vXUl8v1tOyqIwbMVivclruUKpnYu8fRHIwcPkI=
+github.com/wailsapp/wails/v2 v2.0.0-beta.37/go.mod h1:dPVZfCu+SSg6HddAATME5Wj1ObXhSGIYDS7K88P383c=
 github.com/yuin/goldmark v1.3.5/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1Zlc8k=
 go.uber.org/atomic v1.7.0 h1:ADUqmZGgLDDfbSL9ZmPxKTybcoEYHgpYfELNoN+7hsw=
 go.uber.org/atomic v1.7.0/go.mod h1:fEN4uk6kAWBTFdckzkM89CLk9XfWZrxpCo0nPH17wJc=
