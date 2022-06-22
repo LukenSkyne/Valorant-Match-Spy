@@ -24,6 +24,29 @@ export interface PlayerSkin {
 
 // interfaces for https://valorant-api.com/ endpoints
 
+export interface CompetitiveSeasonMap {
+	[uuid: string]: CompetitiveSeason
+}
+
+export interface CompetitiveTierInfoMap {
+	[uuid: string]: CompetitiveTierInfo
+}
+
+export interface CompetitiveSeason {
+	uuid: string // "8d9e3688-470b-c0e0-5b20-ca964d907adb"
+	startTime: string // "2020-04-06T16:00:00Z"
+	endTime: string // "2020-05-29T06:59:00Z"
+	seasonUuid: string // "0df5adb9-4dcb-6899-1306-3e9860661dd3"
+	competitiveTiersUuid: string // "564d8e28-c226-3180-6285-e48a390db8b1"
+	borders: object[]
+}
+
+export interface CompetitiveTierInfo {
+	uuid: string // "564d8e28-c226-3180-6285-e48a390db8b1"
+	assetObjectName: string
+	tiers: CompetitiveTier[]
+}
+
 export interface CompetitiveTier {
 	tier: number // 20
 	tierName: string // "DIAMOND 3"

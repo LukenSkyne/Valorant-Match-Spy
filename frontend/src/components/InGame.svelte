@@ -5,10 +5,10 @@
 	//
 	import { ValorantClient } from "../script/ValorantClient"
 	import type { CoreGameMatch, MatchTeam, PlayerLoadout, PreGameMatch, SessionLoopState } from "../script/Typedef"
-	import type { Player, PlayerSkin } from "./InternalTypes"
+	import type { Player, PlayerSkin, CompetitiveTier } from "./InternalTypes"
 	//
 	import { ClientID, ClientState, Presences } from "../stores/ClientData"
-	import { AllBuddies, AllCompetitiveTiers, AllSkins } from "../stores/ValorantAPI"
+	import { AllBuddies, AllCompetitiveSeasons, AllCompetitiveTierInfo, AllSkins } from "../stores/ValorantAPI"
 	//
 	import PlayerInfo from "./PlayerInfo.svelte"
 	import DecorationTop from "../assets/images/DecorationTop.svelte"
@@ -155,18 +155,55 @@
 
 			const seasonalInfoMap = playerMMR.QueueSkills?.competitive?.SeasonalInfoBySeasonID ?? {}
 			const currentSeasonStats = seasonalInfoMap?.[currentSeasonID]
+			const currentCompSeason = $AllCompetitiveSeasons[currentSeasonID] ?? null
+			const currentCompTiers = $AllCompetitiveTierInfo[currentCompSeason.competitiveTiersUuid]?.tiers ?? null
+			//
 			const rankNow = currentSeasonStats?.CompetitiveTier ?? 0
 			const rrNow = currentSeasonStats?.RankedRating ?? 0
-			//
-			const allRanksBySeason = Object.values(seasonalInfoMap).map((s) => Object.keys(s.WinsByTier ?? {}))
-			const allValidRanks = [].concat(...allRanksBySeason).filter((rank) => rank > 2)
-			//
-			const highestRank = allValidRanks.length > 0 ? Math.max(...allValidRanks) : null
-			const lowestRank = allValidRanks.length > 0 ? Math.min(...allValidRanks) : null
 
-			player.HighestTier = $AllCompetitiveTiers[highestRank] ?? null
-			player.CurrentTier = $AllCompetitiveTiers[rankNow]
-			player.LowestTier = $AllCompetitiveTiers[lowestRank] ?? null
+			const achievedRanks = []
+			const divisionOrder = [
+				"UNRANKED",
+				"IRON",
+				"BRONZE",
+				"SILVER",
+				"GOLD",
+				"PLATINUM",
+				"DIAMOND",
+				"ASCENDANT",
+				"IMMORTAL",
+				"RADIANT",
+			]
+
+			for (const seasonalInfo of Object.values(seasonalInfoMap)) {
+				const compSeason = $AllCompetitiveSeasons[seasonalInfo.SeasonID] ?? null
+				const compTiers = $AllCompetitiveTierInfo[compSeason.competitiveTiersUuid]?.tiers ?? null
+
+				for (const tier of Object.keys(seasonalInfo.WinsByTier ?? {})) {
+					if (tier > 2) {
+						achievedRanks.push(compTiers[tier])
+					}
+				}
+			}
+
+			achievedRanks.sort((a: CompetitiveTier, b: CompetitiveTier) => {
+				const aPos = divisionOrder.indexOf(a.divisionName)
+				const bPos = divisionOrder.indexOf(b.divisionName)
+
+				if (aPos === bPos) {
+					return b.tier - a.tier
+				}
+
+				return bPos - aPos
+			})
+
+			for (const t of achievedRanks) {
+				t.tierName = t.tierName.charAt(0) + t.tierName.slice(1).toLowerCase()
+			}
+
+			player.HighestTier = achievedRanks.at(0) ?? null
+			player.CurrentTier = currentCompTiers[rankNow]
+			player.LowestTier = achievedRanks.at(-1) ?? null
 			player.CurrentRankedRating = rrNow
 
 			players = players // explicit update
@@ -210,7 +247,7 @@
 
 			updateBackground(coreGameMatchData.MapID).catch(console.error)
 			clientTeamID = coreGameMatchData.Players.find((player) => player.Subject === $ClientID)?.TeamID
-			
+
 			players = coreGameMatchData.Players.map(player => ({
 				Subject: player.Subject,
 				TeamID: player.TeamID,
@@ -240,15 +277,16 @@
 	}
 
 	onMount(async () => {
-		if ($AllCompetitiveTiers === null) {
-			const tiersJson = await (await fetch("https://valorant-api.com/v1/competitivetiers")).json()
-			const tierList = tiersJson?.data?.at(-1)?.["tiers"]
+		if ($AllCompetitiveSeasons === null) {
+			const compSeasonsJson = await (await fetch("https://valorant-api.com/v1/seasons/competitive")).json()
+			const compSeasons = compSeasonsJson?.data
+			$AllCompetitiveSeasons = Object.assign({}, ...compSeasons.map((x) => ({[x.seasonUuid]: x})))
+		}
 
-			$AllCompetitiveTiers = tierList?.map((t) => {
-				t.tierName = t.tierName.charAt(0) + t.tierName.slice(1).toLowerCase()
-
-				return t
-			})
+		if ($AllCompetitiveTierInfo === null) {
+			const compTiersJson = await (await fetch("https://valorant-api.com/v1/competitivetiers")).json()
+			const compTiers = compTiersJson?.data
+			$AllCompetitiveTierInfo = Object.assign({}, ...compTiers.map((x) => ({[x.uuid]: x})))
 		}
 
 		if ($AllSkins === null) {

@@ -14,6 +14,7 @@
 		"GOLD": "ffd669",
 		"PLATINUM": "53d3e0",
 		"DIAMOND": "f57ff8",
+		"ASCENDANT": "6ae2af",
 		"IMMORTAL": "ff5877",
 		"RADIANT": "fff0a0",
 	}
