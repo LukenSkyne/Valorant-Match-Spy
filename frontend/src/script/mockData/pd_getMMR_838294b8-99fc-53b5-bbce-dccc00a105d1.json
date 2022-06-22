@@ -112,6 +112,22 @@
 					},
 					"GamesNeededForRating": 0,
 					"TotalWinsNeededForRank": 4
+				},
+				"79f9d00f-433a-85d6-dfc3-60aef115e699": {
+					"SeasonID": "79f9d00f-433a-85d6-dfc3-60aef115e699",
+					"NumberOfWins": 45,
+					"NumberOfWinsWithPlacements": 45,
+					"NumberOfGames": 100,
+					"Rank": 21,
+					"CapstoneWins": 0,
+					"LeaderboardRank": 0,
+					"CompetitiveTier": 21,
+					"RankedRating": 60,
+					"WinsByTier": {
+						"21": 45
+					},
+					"GamesNeededForRating": 0,
+					"TotalWinsNeededForRank": 0
 				}
 			}
 		},
