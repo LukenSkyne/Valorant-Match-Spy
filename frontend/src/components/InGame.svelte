@@ -197,10 +197,6 @@
 				return bPos - aPos
 			})
 
-			for (const t of achievedRanks) {
-				t.tierName = t.tierName.charAt(0) + t.tierName.slice(1).toLowerCase()
-			}
-
 			player.HighestTier = achievedRanks.at(0) ?? null
 			player.CurrentTier = currentCompTiers[rankNow]
 			player.LowestTier = achievedRanks.at(-1) ?? null
@@ -287,6 +283,12 @@
 			const compTiersJson = await (await fetch("https://valorant-api.com/v1/competitivetiers")).json()
 			const compTiers = compTiersJson?.data
 			$AllCompetitiveTierInfo = Object.assign({}, ...compTiers.map((x) => ({[x.uuid]: x})))
+
+			for (const season of Object.values($AllCompetitiveTierInfo)) {
+				for (const t of season.tiers) {
+					t.tierName = t.tierName.charAt(0) + t.tierName.slice(1).toLowerCase()
+				}
+			}
 		}
 
 		if ($AllSkins === null) {
