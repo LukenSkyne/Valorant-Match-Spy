@@ -25,14 +25,6 @@ which runs a [Go](https://go.dev/) application with a [Svelte](https://svelte.de
 
 ## Usage
 
-* download the latest [release](https://github.com/LukenSkyne/Valorant-Match-Spy/releases/latest)
-* run the app and proceed through the possible windows warning
-* depending on your current game state, the app will show you one of the following:
-  * when Valorant is not running, a message saying "Waiting for Valorant to Start..."
-  * when you are currently in the Menus, a message saying "Waiting for Match..."
-  * while in agent select, the app will display details about your Allies
-  * while in-game, the app will display details about every Player
-
 The following screenshot shows the app visualizing a loading screen style overview of the players:
 
 <img src="assets/screenshot-ingame.png" alt="In-Game">
