@@ -11,7 +11,7 @@
 
 <div align="center">
 
-<a href="https://github.com/LukenSkyne/Valorant-Match-Spy/releases/latest">![Total Downloads](https://img.shields.io/github/downloads/LukenSkyne/Valorant-Match-Spy/total)</a>
+<!--<a href="https://github.com/LukenSkyne/Valorant-Match-Spy/releases/latest">![Total Downloads](https://img.shields.io/github/downloads/LukenSkyne/Valorant-Match-Spy/total)</a>-->
 <a href="https://github.com/LukenSkyne/Valorant-Match-Spy/stargazers">![Total Stars](https://img.shields.io/github/stars/LukenSkyne/Valorant-Match-Spy)</a>
 <a href="https://github.com/LukenSkyne/Valorant-Match-Spy/blob/main/LICENSE">![MIT License](https://img.shields.io/github/license/LukenSkyne/Valorant-Match-Spy)</a>
 <a href="https://github.com/LukenSkyne/Valorant-Match-Spy/issues">![Contributions are Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)</a>
