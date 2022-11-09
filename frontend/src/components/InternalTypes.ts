@@ -24,6 +24,20 @@ export interface PlayerSkin {
 
 // interfaces for https://valorant-api.com/ endpoints
 
+export interface SeasonMap {
+	[uuid: string]: Season
+}
+
+export interface Season {
+	uuid: string;
+	displayName: string;
+	type: string;
+	startTime: Date;
+	endTime: Date;
+	parentUuid: string;
+	assetPath: string;
+}
+
 export interface CompetitiveSeasonMap {
 	[uuid: string]: CompetitiveSeason
 }
