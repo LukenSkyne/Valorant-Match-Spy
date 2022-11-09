@@ -8,6 +8,27 @@
 			"TotalGamesNeededForLeaderboard": 1,
 			"CurrentSeasonGamesNeededForRating": 0,
 			"SeasonalInfoBySeasonID": {
+				"2a27e5d2-4d30-c9e2-b15a-93b8909a442c": {
+					"SeasonID": "2a27e5d2-4d30-c9e2-b15a-93b8909a442c",
+					"NumberOfWins": 100,
+					"NumberOfWinsWithPlacements": 101,
+					"NumberOfGames": 182,
+					"Rank": 24,
+					"CapstoneWins": 0,
+					"LeaderboardRank": 0,
+					"CompetitiveTier": 21,
+					"RankedRating": 501,
+					"WinsByTier": {
+						"0": 1,
+						"18": 2,
+						"19": 4,
+						"20": 5,
+						"21": 88,
+						"24": 1
+					},
+					"GamesNeededForRating": 0,
+					"TotalWinsNeededForRank": 0
+				},
 				"3e47230a-463c-a301-eb7d-67bb60357d4f": {
 					"SeasonID": "3e47230a-463c-a301-eb7d-67bb60357d4f",
 					"NumberOfWins": 3,

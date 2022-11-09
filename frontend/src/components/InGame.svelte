@@ -181,7 +181,7 @@
 
 				for (const tier of Object.keys(seasonalInfo.WinsByTier ?? {})) {
 					if (tier > 2) {
-						achievedRanks.push(compTiers[tier])
+						achievedRanks.push(compTiers.find((ct) => ct.tier === Number(tier)))
 					}
 				}
 			}
