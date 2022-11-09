@@ -8,7 +8,13 @@
 	import type { Player, PlayerSkin, CompetitiveTier } from "./InternalTypes"
 	//
 	import { ClientID, ClientState, Presences } from "../stores/ClientData"
-	import { AllBuddies, AllCompetitiveSeasons, AllCompetitiveTierInfo, AllSkins } from "../stores/ValorantAPI"
+	import {
+		AllBuddies,
+		AllCompetitiveSeasons,
+		AllCompetitiveTierInfo,
+		AllSeasons,
+		AllSkins,
+	} from "../stores/ValorantAPI"
 	//
 	import PlayerInfo from "./PlayerInfo.svelte"
 	import DecorationTop from "../assets/images/DecorationTop.svelte"
@@ -139,7 +145,13 @@
 		backgroundUrl = currentMap["splash"] ?? null
 	}
 
+	function capitalizeFirstChar(str: string) {
+		return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+	}
+
 	async function fetchRanks() {
+		const seasonIndexLookup = Object.keys($AllCompetitiveSeasons)
+
 		for (const player of players) {
 			if (player.CurrentTier !== null) {
 				continue
@@ -175,13 +187,27 @@
 				"RADIANT",
 			]
 
-			for (const seasonalInfo of Object.values(seasonalInfoMap)) {
+			const seasonalInfoArr = Object.values(seasonalInfoMap).sort((a, b) => {
+				return seasonIndexLookup.indexOf(a.SeasonID) - seasonIndexLookup.indexOf(b.SeasonID)
+			})
+
+			for (const seasonalInfo of seasonalInfoArr) {
 				const compSeason = $AllCompetitiveSeasons[seasonalInfo.SeasonID] ?? null
 				const compTiers = $AllCompetitiveTierInfo[compSeason.competitiveTiersUuid]?.tiers ?? null
 
+				const act = $AllSeasons[seasonalInfo.SeasonID]
+				const episode = $AllSeasons[act.parentUuid]
+				const displayAct = capitalizeFirstChar(act?.displayName ?? "")
+				const displayEpisode = capitalizeFirstChar(episode?.displayName ?? "")
+				const displaySeason = episode !== undefined ? `${displayEpisode} / ${displayAct}` : displayAct
+
 				for (const tier of Object.keys(seasonalInfo.WinsByTier ?? {})) {
 					if (tier > 2) {
-						achievedRanks.push(compTiers.find((ct) => ct.tier === Number(tier)))
+						const tierInfo = structuredClone(compTiers.find((ct) => ct.tier === Number(tier)))
+						tierInfo.divisionTier = Number(tierInfo.tierName.split(" ")[1]) || 3
+						tierInfo.displaySeason = displaySeason
+
+						achievedRanks.push(tierInfo)
 					}
 				}
 			}
@@ -191,7 +217,7 @@
 				const bPos = divisionOrder.indexOf(b.divisionName)
 
 				if (aPos === bPos) {
-					return b.tier - a.tier
+					return b.divisionTier - a.divisionTier
 				}
 
 				return bPos - aPos
@@ -273,6 +299,12 @@
 	}
 
 	onMount(async () => {
+		if ($AllSeasons === null) {
+			const seasonsJson = await (await fetch("https://valorant-api.com/v1/seasons")).json()
+			const seasons = seasonsJson?.data
+			$AllSeasons = Object.assign({}, ...seasons.map((x) => ({[x.uuid]: x})))
+		}
+
 		if ($AllCompetitiveSeasons === null) {
 			const compSeasonsJson = await (await fetch("https://valorant-api.com/v1/seasons/competitive")).json()
 			const compSeasons = compSeasonsJson?.data
@@ -286,7 +318,7 @@
 
 			for (const season of Object.values($AllCompetitiveTierInfo)) {
 				for (const t of season.tiers) {
-					t.tierName = t.tierName.charAt(0) + t.tierName.slice(1).toLowerCase()
+					t.tierName = capitalizeFirstChar(t.tierName)
 				}
 			}
 		}

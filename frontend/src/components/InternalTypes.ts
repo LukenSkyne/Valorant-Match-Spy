@@ -72,6 +72,10 @@ export interface CompetitiveTier {
 	largeIcon: string
 	rankTriangleDownIcon: string | null
 	rankTriangleUpIcon: string | null
+
+	// additional season info
+	divisionTier?: number
+	displaySeason?: string
 }
 
 export interface Buddy {

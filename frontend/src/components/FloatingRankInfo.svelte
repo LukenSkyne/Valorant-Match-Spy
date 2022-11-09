@@ -39,7 +39,7 @@
 			{:else}
 				<span transition:fly={{ y: -16, duration: 200 }} class="rankText" style={highestTierStyle}
 				>
-					Highest Rank
+					{highestTier.displaySeason}
 				</span>
 			{/if}
 			<img alt src={highestTier.smallIcon} height="100%">
