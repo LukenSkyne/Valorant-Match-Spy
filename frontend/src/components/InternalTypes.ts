@@ -74,7 +74,8 @@ export interface CompetitiveTier {
 	rankTriangleUpIcon: string | null
 
 	// additional season info
-	divisionTier?: number
+	divisionTier: number
+	divisionIndex: number
 	displaySeason?: string
 }
 

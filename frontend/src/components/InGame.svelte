@@ -6,6 +6,7 @@
 	import { ValorantClient } from "../script/ValorantClient"
 	import type { CoreGameMatch, MatchTeam, PlayerLoadout, PreGameMatch, SessionLoopState } from "../script/Typedef"
 	import type { Player, PlayerSkin, CompetitiveTier } from "./InternalTypes"
+	import { compareCompetitiveTier } from "../script/Utils"
 	//
 	import { ClientID, ClientState, Presences } from "../stores/ClientData"
 	import {
@@ -174,19 +175,6 @@
 			const rrNow = currentSeasonStats?.RankedRating ?? 0
 
 			const achievedRanks = []
-			const divisionOrder = [
-				"UNRANKED",
-				"IRON",
-				"BRONZE",
-				"SILVER",
-				"GOLD",
-				"PLATINUM",
-				"DIAMOND",
-				"ASCENDANT",
-				"IMMORTAL",
-				"RADIANT",
-			]
-
 			const seasonalInfoArr = Object.values(seasonalInfoMap).sort((a, b) => {
 				return seasonIndexLookup.indexOf(a.SeasonID) - seasonIndexLookup.indexOf(b.SeasonID)
 			})
@@ -204,7 +192,6 @@
 				for (const tier of Object.keys(seasonalInfo.WinsByTier ?? {})) {
 					if (tier > 2) {
 						const tierInfo = structuredClone(compTiers.find((ct) => ct.tier === Number(tier)))
-						tierInfo.divisionTier = Number(tierInfo.tierName.split(" ")[1]) || 3
 						tierInfo.displaySeason = displaySeason
 
 						achievedRanks.push(tierInfo)
@@ -212,16 +199,8 @@
 				}
 			}
 
-			achievedRanks.sort((a: CompetitiveTier, b: CompetitiveTier) => {
-				const aPos = divisionOrder.indexOf(a.divisionName)
-				const bPos = divisionOrder.indexOf(b.divisionName)
-
-				if (aPos === bPos) {
-					return b.divisionTier - a.divisionTier
-				}
-
-				return bPos - aPos
-			})
+			// sort ranks in reverse order
+			achievedRanks.sort((a, b) => compareCompetitiveTier(b, a))
 
 			player.HighestTier = achievedRanks.at(0) ?? null
 			player.CurrentTier = currentCompTiers[rankNow]
@@ -316,9 +295,24 @@
 			const compTiers = compTiersJson?.data
 			$AllCompetitiveTierInfo = Object.assign({}, ...compTiers.map((x) => ({[x.uuid]: x})))
 
+			const divisionOrder = [
+				"UNRANKED",
+				"IRON",
+				"BRONZE",
+				"SILVER",
+				"GOLD",
+				"PLATINUM",
+				"DIAMOND",
+				"ASCENDANT",
+				"IMMORTAL",
+				"RADIANT",
+			]
+
 			for (const season of Object.values($AllCompetitiveTierInfo)) {
 				for (const t of season.tiers) {
 					t.tierName = capitalizeFirstChar(t.tierName)
+					t.divisionIndex = divisionOrder.indexOf(t.divisionName)
+					t.divisionTier = Number(t.tierName.split(" ")[1]) || 3
 				}
 			}
 		}
