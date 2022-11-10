@@ -49,6 +49,12 @@
 
 		loadoutModalOpen = true
 	}
+
+	function playerNameMouseDown(e: MouseEvent) {
+		if (e.button === 1) {
+			navigator.clipboard.writeText(player.Subject)
+		}
+	}
 </script>
 
 <div class="playerInfo">
@@ -95,7 +101,7 @@
 		</div>
 	</div>
 	<div class="playerBottom" data-team={dataTeam}>
-		<span class="playerName">{player.NameInfo.GameName}</span>
+		<span class="playerName" on:mousedown={playerNameMouseDown}>{player.NameInfo.GameName}</span>
 		<span class="playerTag">#{player.NameInfo.TagLine}</span>
 		<span class="playerLevel">Level {player.PlayerIdentity.AccountLevel}</span>
 		{#if player.CurrentRankedRating !== null}
