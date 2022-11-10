@@ -8,6 +8,7 @@
 	import RankInfo from "./FloatingRankInfo.svelte"
 	import Loadout from "./Loadout.svelte"
 	import Modal from "./ui/Modal.svelte"
+	import Bump from "../assets/images/bump.png"
 
 	export let player: Player
 	export let team: string
@@ -19,6 +20,7 @@
 	$: playerCardImage = `https://media.valorant-api.com/playercards/${player.PlayerIdentity.PlayerCardID}/wideart.png`
 	$: partyStyle = player.PartyColor === null ? null : `background-color: ${player.PartyColor}`
 	$: playerLoadout = player.Loadout === null ? null : player.Loadout
+	$: hasRitoBuddy = (playerLoadout?.find((skin) => skin.buddyID === "ad508aeb-44b7-46bf-f923-959267483e78")) !== undefined
 
 	const contentTierOrder = [
 		"12683d76-48d7-84a3-4e09-6985794f0445", // Select
@@ -75,6 +77,12 @@
 							</div>
 						{/if}
 					{/each}
+				</div>
+			{/if}
+
+			{#if hasRitoBuddy}
+				<div class="ritoBuddyDisplay">
+					<img class="ritoBuddyIcon" src={Bump} alt draggable="false">
 				</div>
 			{/if}
 
@@ -185,6 +193,29 @@
 
     .contentTier {
         font-size: 14px;
+    }
+
+    .ritoBuddyDisplay {
+        position: absolute;
+        left: 4px;
+        bottom: 4px;
+
+        height: 18px;
+        padding: 0 8px;
+        border-radius: 100px;
+
+        display: grid;
+        place-items: center;
+
+        pointer-events: none;
+        user-select: none;
+
+        background-color: #0007;
+    }
+
+    .ritoBuddyIcon {
+        height: 14px;
+        filter: drop-shadow(0px 0px 1px #000);
     }
 
     .cardContainer {
