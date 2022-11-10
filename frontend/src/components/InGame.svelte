@@ -5,7 +5,7 @@
 	//
 	import { ValorantClient } from "../script/ValorantClient"
 	import type { CoreGameMatch, MatchTeam, PlayerLoadout, PreGameMatch, SessionLoopState } from "../script/Typedef"
-	import type { Player, PlayerSkin, CompetitiveTier } from "./InternalTypes"
+	import type { Player, PlayerSkin } from "./InternalTypes"
 	import { compareCompetitiveTier } from "../script/Utils"
 	//
 	import { ClientID, ClientState, Presences } from "../stores/ClientData"

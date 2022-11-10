@@ -2,6 +2,7 @@
 	import { fade, fly } from "svelte/transition"
 	//
 	import type { CompetitiveTier } from "./InternalTypes"
+	import { compareCompetitiveTier } from "../script/Utils.js"
 
 	export let highestTier: CompetitiveTier
 	export let currentTier: CompetitiveTier
@@ -29,7 +30,7 @@
 </script>
 
 <div class="floatingRankInfo" in:fade={{duration: 100 }} on:mouseenter={() => showInfo = true} on:mouseleave={() => showInfo = false}>
-	{#if highestTier !== null && highestTier?.tier !== currentTier?.tier}
+	{#if highestTier !== null && compareCompetitiveTier(highestTier, currentTier) > 0}
 		<div class="rankInfo">
 			{#if hoverRankInfo}
 				<span transition:fly={{ y: 16, duration: 200 }} class="rankText" style={highestTierStyle}
