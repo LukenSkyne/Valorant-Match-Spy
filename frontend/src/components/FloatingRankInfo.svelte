@@ -42,7 +42,9 @@
 					{highestTier.displaySeason}
 				</span>
 			{/if}
-			<img alt src={highestTier.smallIcon} height="100%">
+			<div class="rankWrapper">
+				<img alt src={highestTier.smallIcon} height="100%">
+			</div>
 		</div>
 	{/if}
 	{#if currentTier !== null}
@@ -62,7 +64,9 @@
 				</span>
 			{/if}
 
-			<img alt src={currentTier.smallIcon} height="100%">
+			<div class="rankWrapper">
+				<img alt src={currentTier.smallIcon} height="100%">
+			</div>
 		</div>
 	{/if}
 </div>
@@ -85,6 +89,13 @@
         border-radius: 4px 0 0 4px;
         backdrop-filter: blur(20px);*/
     }
+
+	.rankWrapper {
+		height: 100%;
+		aspect-ratio: 1;
+		display: flex;
+		justify-content: center;
+	}
 
     .rankInfo {
         position: relative;
