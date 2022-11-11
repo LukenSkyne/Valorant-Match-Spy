@@ -8,7 +8,7 @@
 	import type { Player, PlayerSkin } from "./InternalTypes"
 	import { compareCompetitiveTier } from "../script/Utils"
 	//
-	import { ClientID, ClientState, Presences } from "../stores/ClientData"
+	import { ClientID, ClientState, Presences, HoldState } from "../stores/ClientData"
 	import {
 		AllBuddies,
 		AllCompetitiveSeasons,
@@ -213,6 +213,8 @@
 
 	async function fetchMatch(clientState: SessionLoopState | null) {
 		if (clientState === "PREGAME") {
+			$HoldState = false
+
 			const playerData = await ValorantClient.getPreGamePlayerData($ClientID)
 			preGameMatchData = await ValorantClient.getPreGameMatch(playerData.MatchID)
 			const playerNames = await ValorantClient.getNames(preGameMatchData.AllyTeam.Players.map((player) => player.Subject))
@@ -272,6 +274,8 @@
 
 			assignPartyColors()
 			await fetchRanks()
+
+			$HoldState = true
 
 			console.log("coreGameMatchData.ModeID", coreGameMatchData.ModeID)
 		}

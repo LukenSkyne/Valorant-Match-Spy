@@ -5,7 +5,7 @@
 	import { ValorantClient } from "./script/ValorantClient"
 	import type { RawPresence, WebSocketPayload } from "./script/Typedef"
 	//
-	import { ClientID, ClientState, Presences } from "./stores/ClientData"
+	import { ClientID, ClientState, Presences, HoldState } from "./stores/ClientData"
 	//
 	import TitleBar from "./components/ui/TitleBar.svelte"
 	import InGame from "./components/InGame.svelte"
@@ -118,9 +118,9 @@
 
 <TitleBar />
 <div class="container">
-	{#if ($ClientState === null || $ClientState === "MENUS")}
-		<Menus />
-	{:else if ($ClientState === "INGAME" || $ClientState === "PREGAME")}
+	{#if ($ClientState === "INGAME" || $ClientState === "PREGAME" || $HoldState)}
 		<InGame />
+	{:else if ($ClientState === null || $ClientState === "MENUS")}
+		<Menus />
 	{/if}
 </div>
