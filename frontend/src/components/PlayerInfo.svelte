@@ -217,6 +217,7 @@
         user-select: none;
 
         background-color: #0007;
+        backdrop-filter: blur(2px);
     }
 
     .ritoBuddyIcon {
