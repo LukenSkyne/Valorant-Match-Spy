@@ -15,6 +15,7 @@
 		AllCompetitiveTierInfo,
 		AllSeasons,
 		AllSkins,
+		CurrentSeasonID,
 	} from "../stores/ValorantAPI"
 	//
 	import PlayerInfo from "./PlayerInfo.svelte"
@@ -28,7 +29,6 @@
 	let coreGameMatchData: CoreGameMatch
 	let clientTeamID: MatchTeam
 	let players: Player[] = []
-	let currentSeasonID: string = null
 	let backgroundUrl: string = null
 
 	$: allies = players.filter((p) => p.TeamID === clientTeamID)
@@ -167,8 +167,8 @@
 			}
 
 			const seasonalInfoMap = playerMMR.QueueSkills?.competitive?.SeasonalInfoBySeasonID ?? {}
-			const currentSeasonStats = seasonalInfoMap?.[currentSeasonID]
-			const currentCompSeason = $AllCompetitiveSeasons[currentSeasonID] ?? null
+			const currentSeasonStats = seasonalInfoMap?.[$CurrentSeasonID]
+			const currentCompSeason = $AllCompetitiveSeasons[$CurrentSeasonID] ?? null
 			const currentCompTiers = $AllCompetitiveTierInfo[currentCompSeason.competitiveTiersUuid]?.tiers ?? null
 			//
 			const rankNow = currentSeasonStats?.CompetitiveTier ?? 0
@@ -331,9 +331,11 @@
 			$AllBuddies = buddiesJson?.data
 		}
 
-		const content = await ValorantClient.getContent()
-		const currentSeason = content.Seasons.find((season) => season.IsActive && season.Type === "act")
-		currentSeasonID = currentSeason.ID
+		if ($CurrentSeasonID === null) {
+			const content = await ValorantClient.getContent()
+			const currentSeason = content.Seasons.find((season) => season.IsActive && season.Type === "act")
+			$CurrentSeasonID = currentSeason.ID ?? null
+		}
 
 		unsubscribeClientState = ClientState.subscribe((clientState) => {
 			fetchMatch(clientState)
