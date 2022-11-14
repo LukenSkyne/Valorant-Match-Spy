@@ -23,7 +23,14 @@
 this project is powered by [Wails](https://wails.io/docs/gettingstarted/installation)
 which runs a [Go](https://go.dev/) application with a [Svelte](https://svelte.dev/) frontend.
 
-## Usage
+## How To Run & Develop
+
+Due to policy changes, I can no longer provide release binaries.
+* Install the [Wails CLI](https://wails.io/docs/gettingstarted/installation/) along with Go.
+* To run in live development mode, run `wails dev` in the project directory.
+* To build a redistributable, production mode package, use `wails build`.
+
+## Gallery
 
 The following screenshot shows the app visualizing a loading screen style overview of the players:
 
@@ -36,11 +43,6 @@ Hovering over a playercard shows details about a players loadout:
 Clicking on the playercard brings up the loadout of the respective player:
 
 <img src="assets/screenshot-loadout.png" alt="Loadout">
-
-## Development & Compiling yourself
-
-* To run in live development mode, run `wails dev` in the project directory.
-* To build a redistributable, production mode package, use `wails build`.
 
 ## Acknowledgements
 
