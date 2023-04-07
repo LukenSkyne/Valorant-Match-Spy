@@ -10,11 +10,6 @@
 
 	$: title = "Valorant Match Spy v" + currentVersion
 
-	const doubleClickInterval = 500
-	let lastClickPosX: number = null
-	let lastClickPosY: number = null
-	let lastClickTime: number = null
-	//
 	let currentVersion: string = null
 	let latestVersion: string = null
 	let updateCompleteDialog = false
@@ -47,18 +42,11 @@
 			currentElement = currentElement.parentElement
 		}
 
-		if (lastClickTime !== null &&
-			(Date.now() - lastClickTime) < doubleClickInterval &&
-			Math.abs(lastClickPosX - e.screenX) < 2 &&
-			Math.abs(lastClickPosY - e.screenY) < 2) {
+		if (e.detail % 2 == 0) {
 			WindowToggleMaximise()
 		} else {
 			window["WailsInvoke"]?.("drag")
 		}
-
-		lastClickPosX = e.screenX
-		lastClickPosY = e.screenY
-		lastClickTime = Date.now()
 	}
 
 	onMount(async () => {
@@ -126,6 +114,7 @@
     .logo {
         height: 16px;
         margin-left: 6px;
+		pointer-events: none;
     }
 
     .title {
