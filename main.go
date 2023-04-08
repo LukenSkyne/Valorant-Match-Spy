@@ -39,7 +39,8 @@ func main() {
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
-		OnStartup: client.OnStartup,
+		BackgroundColour: &options.RGBA{R: 34, G: 34, B: 34, A: 1},
+		OnStartup:        client.OnStartup,
 		Bind: []interface{}{
 			client,
 			utility,
