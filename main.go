@@ -4,6 +4,7 @@ import (
 	"embed"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
+	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"match-spy/internal/utils"
@@ -35,7 +36,9 @@ func main() {
 		MinWidth:  1024,
 		MinHeight: 768,
 		Frameless: true,
-		Assets:    assets,
+		AssetServer: &assetserver.Options{
+			Assets: assets,
+		},
 		OnStartup: client.OnStartup,
 		Bind: []interface{}{
 			client,
