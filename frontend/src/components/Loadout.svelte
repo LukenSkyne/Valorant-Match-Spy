@@ -101,7 +101,7 @@
         grid-column: 3;
     }
 
-    .gunContainer:nth-child(n+14) {
+    .gunContainer:nth-child(n+15) {
         grid-column: 4;
     }
 

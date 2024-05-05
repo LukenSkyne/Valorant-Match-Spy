@@ -94,12 +94,13 @@
 			"4ade7faa-4cf1-8376-95ef-39884480959b": "guardian",
 			"ee8e8d15-496b-07ac-e5f6-8fae5d4c7b1a": "phantom",
 			"9c82e19d-4575-0200-1a81-3eacf00cf872": "vandal",
+			"2f59173c-4bed-b6c3-2191-dea9b58be9c7": "melee",
 
 			"c4883e50-4494-202c-3ec3-6b8a9284f00b": "marshal",
+			"5f0aaf7a-4289-3998-d5ff-eb9a5cf7ef5c": "outlaw",
 			"a03b24d3-4319-996d-0f8c-94bbfba1dfc7": "operator",
 			"55d8a0f4-4274-ca67-fe2c-06ab45efdf58": "ares",
 			"63e6c2b6-4a8e-869c-3d4c-e38355226584": "odin",
-			"2f59173c-4bed-b6c3-2191-dea9b58be9c7": "melee",
 		}
 
 		const playerLoadouts = loadouts.map((playerLoadout) => {
